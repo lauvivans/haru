@@ -1,0 +1,27 @@
+.welcome-section {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1rem;
+  padding: 1rem;
+  margin: auto 0;
+}
+
+.welcome-section img {
+  max-width: 100px;
+  place-self: center;
+}
+
+.welcome-section__connection {
+  display: flex;
+  column-gap: 0.5rem;
+  flex: 1;
+}
+
+.welcome-section__connection input {
+  border: 1px solid var(--border);
+  background-color: var(--bg);
+  border-radius: 5px;
+  padding: .5rem;
+  flex: 2;
+}
+
