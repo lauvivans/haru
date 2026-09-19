@@ -10,7 +10,8 @@
     "semicolon": {
       "options": ["always"]
     },
-    "only-arrow-functions": false
+    "only-arrow-functions": false,
+    "object-literal-sort-keys": false
   },
   "jsRules": {}
 }
