@@ -1,1 +1,1 @@
-# hangman-server
+# signaling-server
