@@ -30,7 +30,7 @@ Where do the Haru client and the signaling server run so the game costs as close
 | Option                                              | Cost per month       | Our own backend | Notes                                                                                   |
 | --------------------------------------------------- | -------------------- | --------------- | --------------------------------------------------------------------------------------- |
 | **Workers + Durable Objects (chosen)**              | $0                   | Yes, small      | Free daily limits; hibernation; client and signaling in one deploy                      |
-| Fastify on the shared EC2 + client on Cloudflare    | Share of the EC2     | Yes             | Uses memory on the 1 GB `t4g.micro` that Yoko and notion-portfolio need; Caddy and Docker upkeep |
+| Fastify on the shared EC2 + client on Cloudflare    | Share of the EC2     | Yes             | Uses memory on the 1 GB `t4g.micro` that Yoko needs; Caddy and Docker upkeep |
 | Trystero (Nostr, MQTT or BitTorrent relays)         | $0                   | No              | No server at all; discovery depends on public relays we don't control; its README recommends a TURN server for blocked networks |
 | PeerJS cloud server                                 | $0                   | No              | The docs publish no quota or uptime for the cloud server                               |
 | Firebase Realtime Database as signaling             | $0                   | No              | Spark plan: 100 simultaneous connections; adds the Firebase SDK and a Google project |
