@@ -146,16 +146,19 @@ export function mountGallows(canvas: HTMLCanvasElement, size?: SpriteSize) {
   }
 
   let misses = -1; // nothing shown yet
+  let guesses = 0;
   return {
     // Acts only on what changed. The first call shows the pieces without the fall;
-    // going back to 0 misses resets it for a new round.
-    update(next: { misses: number; mood: Mood }) {
+    // going back to 0 misses resets it for a new round. A new guess count replays
+    // the mood, so two misses in a row both get a reaction.
+    update(next: { misses: number; mood: Mood; guesses: number }) {
       if (next.misses !== misses) {
         if (next.misses === 0) reset();
         else setMisses(next.misses, misses === -1);
       }
-      if (misses === -1 || next.mood !== s.mood) setMood(next.mood);
+      if (misses === -1 || next.mood !== s.mood || next.guesses !== guesses) setMood(next.mood);
       misses = next.misses;
+      guesses = next.guesses;
     },
     stop() {
       stopTweens();

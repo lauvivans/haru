@@ -191,11 +191,13 @@ export function mountSprite(canvas: HTMLCanvasElement, size: SpriteSize, fixedLo
   });
 
   let first = true;
+  let guesses = 0;
   return {
-    // Reacts only when the mood changes; the first call sets the starting mood
-    update({ mood }: { mood: Mood }) {
-      if (!first && mood === s.mood) return;
+    // Reacts when the mood or the guess count changes; the first call sets the starting mood
+    update({ mood, guesses: next }: { mood: Mood; guesses: number }) {
+      if (!first && mood === s.mood && next === guesses) return;
       first = false;
+      guesses = next;
       s.mood = mood;
       react(s, mood);
     },
