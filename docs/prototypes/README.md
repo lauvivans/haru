@@ -35,3 +35,7 @@ Every page has a day and night switch and an EN/PT switch. The dashed bar on `ro
 - GSAP (from cdnjs) runs the motion: the camera, Haru's reactions and the gallows pieces falling into place. Without GSAP, or when the system asks for reduced motion, everything jumps to its final state.
 - `haru.js` renders the header, the theme and language switches and runs a round. It is a plain script with no build, so the pages open straight from disk.
 - The physical keyboard types letters on the game screens.
+
+## In the app
+
+`tokens.css` and `base.css` are copied to `src/styles/` (without the prototype-only parts), and `pixel.js` is ported to `src/pixel/` as TypeScript. A change made here gets copied there.

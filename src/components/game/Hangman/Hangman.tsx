@@ -2,6 +2,7 @@ import "./Hangman.css";
 import { useSocket } from "@/context/SocketContext";
 import useChannel from "@/hooks/useChannel";
 import { useMemo, useRef } from "react";
+import { Gallows } from "@/components/game/Gallows/Gallows";
 
 const ALPHABET = [
   "A",
@@ -122,118 +123,7 @@ const Hangman = () => {
           )}
 
           <div className="hangman-drawing">
-            <svg width="200" height="250" viewBox="0 0 200 250">
-              <line
-                x1="10"
-                y1="230"
-                x2="150"
-                y2="230"
-                stroke="black"
-                strokeWidth="4"
-              />
-              <line
-                x1="50"
-                y1="230"
-                x2="50"
-                y2="20"
-                stroke="black"
-                strokeWidth="4"
-              />
-              <line
-                x1="50"
-                y1="20"
-                x2="130"
-                y2="20"
-                stroke="black"
-                strokeWidth="4"
-              />
-              <line
-                x1="130"
-                y1="20"
-                x2="130"
-                y2="50"
-                stroke="black"
-                strokeWidth="4"
-              />
-
-              {/* Head */}
-              {misses >= 1 && (
-                <circle
-                  cx="130"
-                  cy="70"
-                  r="20"
-                  stroke="black"
-                  strokeWidth="2"
-                  fill="none"
-                  className="hangman-part animate-head"
-                />
-              )}
-
-              {/* Body */}
-              {misses >= 2 && (
-                <line
-                  x1="130"
-                  y1="90"
-                  x2="130"
-                  y2="150"
-                  stroke="black"
-                  strokeWidth="2"
-                  className="hangman-part animate-body"
-                />
-              )}
-
-              {/* Left arm */}
-              {misses >= 3 && (
-                <line
-                  x1="130"
-                  y1="110"
-                  x2="100"
-                  y2="130"
-                  stroke="black"
-                  strokeWidth="2"
-                  className="hangman-part animate-left-arm"
-                />
-              )}
-
-              {/* Right arm */}
-              {misses >= 4 && (
-                <line
-                  x1="130"
-                  y1="110"
-                  x2="160"
-                  y2="130"
-                  stroke="black"
-                  strokeWidth="2"
-                  className="hangman-part animate-right-arm"
-                />
-              )}
-
-              {/* Left leg */}
-              {misses >= 5 && (
-                <line
-                  x1="130"
-                  y1="150"
-                  x2="110"
-                  y2="190"
-                  stroke="black"
-                  strokeWidth="2"
-                  className="hangman-part animate-left-leg"
-                />
-              )}
-
-              {/* Right leg */}
-              {misses >= 6 && (
-                <line
-                  x1="130"
-                  y1="150"
-                  x2="150"
-                  y2="190"
-                  stroke="black"
-                  strokeWidth="2"
-                  className="hangman-part animate-right-leg"
-                />
-              )}
-            </svg>
+            <Gallows misses={misses} mood={misses === 7 ? "loss" : word && hits === word.length ? "win" : "idle"} />
           </div>
 
           {misses === 7 && (

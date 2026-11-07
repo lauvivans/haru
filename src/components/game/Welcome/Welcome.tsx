@@ -31,13 +31,13 @@ const Welcome = () => {
       <h1>Welcome to Haru</h1>
       <img src={Mascot} />
       <p>Server is {isServerAwake ? "awake" : "down"}</p>
-      <button className="btn-default" onClick={connectToSignalingServer}>
+      <button className="btn btn--ghost" onClick={connectToSignalingServer}>
         Connect to server
       </button>
       {isServerAwake && peerId && <p>Your peerId is: {peerId}</p>}
       <div className="welcome-section__connection">
         <input ref={inputRef} placeholder="Set peerId you want to connect" />
-        <button className="btn-default" onClick={handleInitiateConnection}>
+        <button className="btn btn--ghost" onClick={handleInitiateConnection}>
           Initiate connection
         </button>
       </div>
