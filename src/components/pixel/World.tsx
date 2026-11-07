@@ -5,16 +5,15 @@ import { mountWorld, type Scene } from "@/pixel/world";
 export function World({ scene }: { scene: Scene }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const world = useRef<ReturnType<typeof mountWorld>>(null);
-  const first = useRef(scene);
 
   useEffect(() => {
-    const w = mountWorld(ref.current!, first.current);
+    const w = mountWorld(ref.current!);
     world.current = w;
-    return () => w.stop();
+    return w.stop;
   }, []);
 
   useEffect(() => {
-    world.current?.goTo(scene);
+    world.current!.update({ scene });
   }, [scene]);
 
   return <canvas ref={ref} className="world" aria-hidden="true" />;

@@ -190,10 +190,14 @@ export function mountSprite(canvas: HTMLCanvasElement, size: SpriteSize, fixedLo
     drawHaru(r, 5 + Math.round(s.dx), oy, s, T);
   });
 
+  let first = true;
   return {
-    setMood(m: Mood) {
-      s.mood = m;
-      react(s, m);
+    // Reacts only when the mood changes; the first call sets the starting mood
+    update({ mood }: { mood: Mood }) {
+      if (!first && mood === s.mood) return;
+      first = false;
+      s.mood = mood;
+      react(s, mood);
     },
     stop() {
       s.loop?.kill();

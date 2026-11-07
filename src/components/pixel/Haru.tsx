@@ -13,14 +13,15 @@ export function Haru({ mood = "idle", size = "md", look, onClick }: Props) {
   const ref = useRef<HTMLCanvasElement>(null);
   const sprite = useRef<ReturnType<typeof mountSprite>>(null);
 
+  // A new size or look mounts a new canvas, so the mood runs again after it
   useEffect(() => {
     const s = mountSprite(ref.current!, size, look);
     sprite.current = s;
-    return () => s.stop();
+    return s.stop;
   }, [size, look]);
 
   useEffect(() => {
-    sprite.current?.setMood(mood);
+    sprite.current!.update({ mood });
   }, [mood, size, look]);
 
   return <canvas ref={ref} className="sprite" aria-hidden="true" onClick={onClick} />;

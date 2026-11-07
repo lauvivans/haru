@@ -113,36 +113,49 @@ export function mountGallows(canvas: HTMLCanvasElement, size?: SpriteSize) {
     gsap.killTweensOf(s);
     s.loop = null;
   }
+  // A new round: no pieces, Haru on the ground
+  function reset() {
+    stopTweens();
+    for (let i = 1; i <= MAX_MISSES; i++) part[i] = 0;
+    s.hy = HY.ground;
+    s.mood = "idle";
+    react(s, "idle");
+  }
 
+  // instant: no falling pieces, for a round shown already in progress
+  function setMisses(n: number, instant: boolean) {
+    for (let i = 1; i <= MAX_MISSES; i++) {
+      const want = i <= n ? 1 : 0;
+      if (part[i] === want) continue;
+      if (instant || want === 0) part[i] = want;
+      else to(part, { [i]: 1, duration: i === 7 ? 0.2 : 0.45, ease: i >= 5 ? "power2.in" : "bounce.out" });
+    }
+    const hy = n >= MAX_MISSES ? HY.dropped : n >= 1 ? HY.platform : HY.ground;
+    if (instant) s.hy = hy;
+    else if (hy !== s.hy) to(s, { hy, duration: 0.35, delay: n === 1 ? 0.35 : 0, ease: n >= MAX_MISSES ? "power2.in" : "back.out(2)" });
+  }
+
+  function setMood(m: Mood) {
+    s.mood = m;
+    react(s, m);
+    if (m === "win" && part[6] > 0) to(part, { 6: 0, duration: 0.4, ease: "power2.out" });
+    if (m === "loss") {
+      s.dx = -1;
+      s.loop = to(s, { dx: 1, duration: 0.7, yoyo: true, repeat: -1, ease: "sine.inOut", delay: 0.2 });
+    }
+  }
+
+  let misses = -1; // nothing shown yet
   return {
-    // A new round: no pieces, Haru on the ground
-    reset() {
-      stopTweens();
-      for (let i = 1; i <= MAX_MISSES; i++) part[i] = 0;
-      s.hy = HY.ground;
-      s.mood = "idle";
-      react(s, "idle");
-    },
-    // instant: no falling pieces, for a round shown already in progress
-    setMisses(n: number, instant = false) {
-      for (let i = 1; i <= MAX_MISSES; i++) {
-        const want = i <= n ? 1 : 0;
-        if (part[i] === want) continue;
-        if (instant || want === 0) part[i] = want;
-        else to(part, { [i]: 1, duration: i === 7 ? 0.2 : 0.45, ease: i >= 5 ? "power2.in" : "bounce.out" });
+    // Acts only on what changed. The first call shows the pieces without the fall;
+    // going back to 0 misses resets it for a new round.
+    update(next: { misses: number; mood: Mood }) {
+      if (next.misses !== misses) {
+        if (next.misses === 0) reset();
+        else setMisses(next.misses, misses === -1);
       }
-      const hy = n >= MAX_MISSES ? HY.dropped : n >= 1 ? HY.platform : HY.ground;
-      if (instant) s.hy = hy;
-      else if (hy !== s.hy) to(s, { hy, duration: 0.35, delay: n === 1 ? 0.35 : 0, ease: n >= MAX_MISSES ? "power2.in" : "back.out(2)" });
-    },
-    setMood(m: Mood) {
-      s.mood = m;
-      react(s, m);
-      if (m === "win" && part[6] > 0) to(part, { 6: 0, duration: 0.4, ease: "power2.out" });
-      if (m === "loss") {
-        s.dx = -1;
-        s.loop = to(s, { dx: 1, duration: 0.7, yoyo: true, repeat: -1, ease: "sine.inOut", delay: 0.2 });
-      }
+      if (misses === -1 || next.mood !== s.mood) setMood(next.mood);
+      misses = next.misses;
     },
     stop() {
       stopTweens();

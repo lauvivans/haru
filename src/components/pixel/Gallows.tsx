@@ -9,29 +9,20 @@ type Props = {
 };
 
 // The gallows with Haru on it. Back to 0 misses resets it for a new round.
-// A round that mounts already in progress shows its pieces without the fall.
 export function Gallows({ misses, mood = "idle", size }: Props) {
   const ref = useRef<HTMLCanvasElement>(null);
   const stage = useRef<ReturnType<typeof mountGallows>>(null);
-  const mounted = useRef(false);
 
+  // A new size mounts a new canvas, so the state runs again after it
   useEffect(() => {
     const g = mountGallows(ref.current!, size);
     stage.current = g;
-    mounted.current = false;
-    return () => g.stop();
+    return g.stop;
   }, [size]);
 
   useEffect(() => {
-    const g = stage.current!;
-    if (misses === 0) g.reset();
-    else g.setMisses(misses, !mounted.current);
-    mounted.current = true;
-  }, [misses, size]);
-
-  useEffect(() => {
-    stage.current?.setMood(mood);
-  }, [mood, size]);
+    stage.current!.update({ misses, mood });
+  }, [misses, mood, size]);
 
   return <canvas ref={ref} className="stage" aria-hidden="true" />;
 }

@@ -168,7 +168,7 @@ function banner(r: Pen, X: number, G: number, T: number) {
   r(X + 4, G - 33, 5, 1, "flag-alt");
 }
 
-export function mountWorld(canvas: HTMLCanvasElement, scene: Scene) {
+export function mountWorld(canvas: HTMLCanvasElement) {
   const ctx = canvas.getContext("2d")!;
   const r = pen(ctx);
   let W = 0, H = 0;
@@ -186,15 +186,16 @@ export function mountWorld(canvas: HTMLCanvasElement, scene: Scene) {
   size();
   addEventListener("resize", size);
 
-  // Camera: on the first load it slides in a little; then from spot to spot
-  const cam = { x: SCENES[scene] - 160 };
-  function goTo(next: Scene) {
-    const target = SCENES[next];
+  // Camera: the first scene slides in a little; then it goes from spot to spot
+  let cam: { x: number } | null = null;
+  function update({ scene }: { scene: Scene }) {
+    const target = SCENES[scene];
+    cam ??= { x: target - 160 };
     to(cam, { x: target, duration: Math.min(2.6, 0.6 + Math.abs(target - cam.x) / 400), ease: "power2.inOut", overwrite: true });
   }
-  goTo(scene);
 
   function draw(T: number) {
+    if (!cam) return; // no scene yet
     const cx = cam.x;
     const G = H - 20;
     const horizon = G - 60;
@@ -289,7 +290,7 @@ export function mountWorld(canvas: HTMLCanvasElement, scene: Scene) {
   const stop = onFrame(draw);
 
   return {
-    goTo,
+    update,
     stop() {
       removeEventListener("resize", size);
       stop();
