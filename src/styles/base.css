@@ -1,0 +1,488 @@
+/* Haru base styles and components. Every value comes from tokens.css.
+   Copied from docs/prototypes/base.css, without the prototype-only parts:
+   change the prototype first. */
+
+:root {
+  /* Pixel corner: the four corners cut by one UI pixel */
+  --clip-notch: polygon(
+    var(--notch) 0, calc(100% - var(--notch)) 0, 100% var(--notch),
+    100% calc(100% - var(--notch)), calc(100% - var(--notch)) 100%,
+    var(--notch) 100%, 0 calc(100% - var(--notch)), 0 var(--notch)
+  );
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+[hidden] { display: none !important; }
+
+html { color-scheme: light dark; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  color: var(--text);
+  background: var(--bg-page);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-pixel);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  margin: 0 0 var(--space-3);
+}
+
+h1 { font-size: var(--text-2xl); }
+h2 { font-size: var(--text-xl); }
+h3 { font-size: var(--text-lg); }
+
+p { margin: 0 0 var(--space-4); }
+
+a { color: var(--accent); font-weight: var(--weight-bold); }
+
+code { font-size: var(--text-sm); }
+
+:focus-visible {
+  outline: var(--px) solid var(--focus);
+  outline-offset: var(--px);
+}
+
+/* The world: a pixel art village behind every screen */
+.world {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 0;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+/* Layout */
+.page {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--space-4) var(--space-5);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+main { flex: 1; display: flex; flex-direction: column; }
+
+.stack > * + * { margin-top: var(--space-4); }
+
+.muted { color: var(--text-muted); }
+
+.center { text-align: center; }
+
+.spacer { flex: 1; }
+
+/* Text straight on the sky */
+.sky-text {
+  font-family: var(--font-pixel);
+  font-weight: var(--weight-bold);
+  color: var(--title);
+  text-shadow: var(--shadow-title);
+}
+
+/* Character picker */
+.looks {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.look {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3) calc(var(--space-2) + var(--px));
+  background: var(--panel);
+  color: var(--text);
+  border: var(--px) solid var(--panel-edge);
+  clip-path: var(--clip-notch);
+  box-shadow: var(--shadow-panel);
+  font-family: var(--font-pixel);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.look[aria-checked="true"] {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  border-color: var(--px-outline);
+  box-shadow: var(--shadow-button);
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+.logo {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xl);
+  color: var(--title);
+  text-shadow: var(--shadow-title);
+  text-decoration: none;
+}
+
+.header__tools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.header__link {
+  display: none;
+  font-family: var(--font-pixel);
+  color: var(--title);
+  text-shadow: var(--shadow-title);
+  text-decoration: none;
+}
+
+@media (min-width: 600px) {
+  .header__link { display: inline; }
+}
+
+/* Panels: parchment by day, stone by night */
+.panel {
+  background: var(--panel);
+  color: var(--text);
+  border: var(--px) solid var(--panel-edge);
+  clip-path: var(--clip-notch);
+  box-shadow: var(--shadow-panel);
+  padding: var(--space-5);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--key-size);
+  padding: var(--space-2) var(--space-5) calc(var(--space-2) + var(--px));
+  border: var(--px) solid var(--px-outline);
+  clip-path: var(--clip-notch);
+  font-family: var(--font-pixel);
+  font-size: var(--text-lg);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn:active { transform: translateY(var(--px)); }
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  box-shadow: var(--shadow-button);
+}
+
+.btn--ghost {
+  background: var(--key);
+  color: var(--text);
+  box-shadow: var(--shadow-key);
+}
+
+.btn--small {
+  min-height: auto;
+  padding: var(--space-1) var(--space-3) calc(var(--space-1) + var(--px));
+  font-size: var(--text-sm);
+}
+
+.btn--block { width: 100%; }
+
+/* Toggles (language and theme) */
+.toggle {
+  display: inline-flex;
+  border: var(--px) solid var(--px-outline);
+  clip-path: var(--clip-notch);
+  background: var(--panel);
+}
+
+.toggle button {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-pixel);
+  font-size: var(--text-sm);
+  min-width: var(--space-6);
+  height: var(--space-6);
+  cursor: pointer;
+}
+
+.toggle button[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+/* Landing */
+.hero {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: var(--space-5) 0;
+}
+
+.hero h1 { font-size: var(--text-3xl); margin: 0; }
+
+.hero p { max-width: var(--text-max); font-size: var(--text-lg); margin: 0; }
+
+.hero .sprite { cursor: pointer; }
+
+.modes {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 600px) {
+  .modes { grid-template-columns: 1fr 1fr; }
+}
+
+.mode {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.mode p { flex: 1; color: var(--text-muted); }
+
+/* Fields */
+.field { display: grid; gap: var(--space-1); }
+
+.field label { font-family: var(--font-pixel); font-size: var(--text-md); }
+
+.field__hint { font-size: var(--text-xs); color: var(--text-muted); }
+
+.input-row { display: flex; gap: var(--space-2); }
+
+.input {
+  width: 100%;
+  min-height: var(--key-size);
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  color: var(--text);
+  background: var(--key);
+  border: var(--px) solid var(--panel-edge);
+  border-radius: 0;
+}
+
+.input:focus { border-color: var(--accent); outline: none; }
+
+.code {
+  font-family: var(--font-pixel);
+  letter-spacing: var(--tracking-blank);
+}
+
+/* Narrow screens like the room flow */
+.narrow {
+  width: 100%;
+  max-width: var(--text-max);
+  margin: var(--space-5) auto;
+}
+
+.narrow .sprite { display: block; margin: 0 auto; }
+
+/* Game board: the gallows scene on top, the word and keyboard below */
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.stage-wrap {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: var(--stage-height);
+}
+
+.stage { image-rendering: pixelated; display: block; }
+
+.board__panel { display: grid; gap: var(--space-3); }
+
+.hint {
+  justify-self: center;
+  font-family: var(--font-pixel);
+  padding: var(--space-1) var(--space-4);
+  background: var(--accent);
+  color: var(--text-on-accent);
+  clip-path: var(--clip-notch);
+}
+
+.misses {
+  text-align: center;
+  font-family: var(--font-pixel);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Word blanks */
+.word {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-1) var(--space-4);
+  font-family: var(--font-pixel);
+  font-size: var(--text-xl);
+}
+
+.word__group { display: flex; gap: var(--space-1); }
+
+.word__slot {
+  width: var(--slot-width);
+  min-height: var(--slot-width);
+  text-align: center;
+  border-bottom: var(--px) solid var(--text);
+}
+
+.word__slot--fixed { border-bottom-color: transparent; }
+
+.word__slot--missed { color: var(--miss); }
+
+/* On-screen keyboard */
+.keyboard {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-1);
+  max-width: var(--text-max);
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 600px) {
+  .keyboard { grid-template-columns: repeat(9, 1fr); }
+}
+
+@media (min-width: 960px) {
+  .keyboard { grid-template-columns: repeat(13, 1fr); }
+}
+
+.key {
+  height: var(--key-size);
+  border: var(--px) solid var(--px-outline);
+  clip-path: var(--clip-notch);
+  background: var(--key);
+  color: var(--text);
+  font-family: var(--font-pixel);
+  font-size: var(--text-lg);
+  box-shadow: var(--shadow-key);
+  cursor: pointer;
+}
+
+.key:hover:not(:disabled) { background: var(--panel-shade); }
+
+.key:disabled { cursor: default; }
+
+.key--hit { background: var(--hit); color: var(--white); box-shadow: inset 0 calc(var(--px) * -1) 0 var(--hit-dark); }
+
+.key--miss { background: var(--miss); color: var(--white); box-shadow: inset 0 calc(var(--px) * -1) 0 var(--miss-dark); }
+
+.keyboard--locked .key:not(.key--hit):not(.key--miss) { opacity: 0.5; }
+
+/* Two players */
+.score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  font-family: var(--font-pixel);
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: var(--panel);
+  color: var(--text);
+  border: var(--px) solid var(--panel-edge);
+  clip-path: var(--clip-notch);
+}
+
+.player__role { font-size: var(--text-xs); color: var(--text-muted); }
+
+.score__points { font-size: var(--text-xl); color: var(--title); text-shadow: var(--shadow-title); }
+
+.status {
+  text-align: center;
+  font-family: var(--font-pixel);
+  color: var(--title);
+  text-shadow: var(--shadow-title);
+  margin: 0;
+}
+
+/* End of round */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: var(--bg-overlay);
+}
+
+.result {
+  width: 100%;
+  max-width: var(--dialog-max);
+  text-align: center;
+}
+
+.result .sprite { display: block; margin: 0 auto var(--space-3); }
+
+.result__word {
+  font-family: var(--font-pixel);
+  font-size: var(--text-xl);
+  letter-spacing: var(--tracking-blank);
+  margin-bottom: var(--space-4);
+}
+
+.result__actions { display: grid; gap: var(--space-2); }
+
+/* How it works */
+.prose { max-width: var(--text-max); margin: var(--space-4) auto; }
+
+.prose ul, .prose ol { padding-left: var(--space-5); margin: 0 0 var(--space-4); }
+
+.prose .panel + .panel { margin-top: var(--space-5); }
+
+.diagram { width: 100%; height: auto; display: block; margin: var(--space-4) 0; }
+
+.diagram text { font-family: var(--font-pixel); fill: var(--text); font-size: var(--text-sm); }
+
+.diagram .diagram__muted { fill: var(--text-muted); font-size: var(--text-xs); }
+
+.diagram .diagram__box { fill: var(--key); stroke: var(--px-outline); stroke-width: var(--px); }
+
+.diagram .diagram__server { fill: var(--accent); stroke: var(--px-outline); stroke-width: var(--px); }
+
+.diagram .diagram__server-text { fill: var(--text-on-accent); }
+
+.diagram .diagram__arrow { stroke: var(--text-muted); stroke-width: var(--px); fill: none; stroke-dasharray: 4 4; }
+
+.diagram .diagram__channel { stroke: var(--hit); stroke-width: var(--px); fill: none; }
+
+.diagram .diagram__relay { stroke: var(--accent); stroke-width: var(--px); fill: none; stroke-dasharray: 2 6; }
+
+/* Haru sprite and the gallows: small canvases painted by src/pixel */
+.sprite { image-rendering: pixelated; }
