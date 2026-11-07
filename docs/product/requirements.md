@@ -28,7 +28,9 @@ What Haru does and the rules the game follows. This is a first draft, so the ope
 ## Solo mode
 
 - The game picks a random word from a built-in list in the interface language.
-- Each word has a category shown as a hint (for example "Animal" or "Food").
+- Each word has a category shown as a hint. There are 5 categories: animals, food, countries, objects and jobs.
+- Each language has its own list of about 150 words, 30 per category, written by hand for this project. The Portuguese list is made of Portuguese words, not translations of the English one.
+- Words are common ones, from 3 to 14 letters, with no proper names other than countries.
 - A word doesn't repeat until the list runs out in that browser.
 - It works with no connection after the page loads.
 
@@ -45,6 +47,3 @@ What Haru does and the rules the game follows. This is a first draft, so the ope
 - If a player leaves or loses the connection, the other sees a message and can wait in the room or go back home.
 - Game moves go directly between the two browsers (WebRTC). The server only helps them connect and keeps the room in memory while it is open. See [decision 001](../decisions/001-stack-and-hosting.md).
 
-## Open questions
-
-- **Word list.** Size and categories of the solo list, and where the words come from.
