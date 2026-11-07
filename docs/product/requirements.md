@@ -1,6 +1,6 @@
 # Product requirements
 
-What Haru does and the rules the game follows. This is a first draft, so the open questions are listed at the end.
+What Haru does and the rules the game follows.
 
 ## General
 
@@ -46,4 +46,3 @@ What Haru does and the rules the game follows. This is a first draft, so the ope
 - The room keeps the score of the session: rounds won by each player.
 - If a player leaves or loses the connection, the other sees a message and can wait in the room or go back home.
 - Game moves go directly between the two browsers (WebRTC). The server only helps them connect and keeps the room in memory while it is open. See [decision 001](../decisions/001-stack-and-hosting.md).
-
