@@ -128,7 +128,6 @@
   --text-xl: 1.75rem;
   --text-2xl: 2.5rem;
   --text-3xl: 4rem;
-  --weight-regular: 400;
   --weight-bold: 700;
   --leading-tight: 1.1;
   --leading-body: 1.55;
@@ -142,7 +141,6 @@
   --space-5: 1.5rem;
   --space-6: 2rem;
   --space-7: 3rem;
-  --space-8: 4.5rem;
 
   /* Sizes */
   --px: 4px; /* one UI pixel: borders, notched corners, button depth */
@@ -178,8 +176,6 @@
     var(--outline-px) var(--outline-px) 0 var(--title-shadow),
     var(--px) var(--px) 0 var(--title-shadow);
 
-  /* Motion */
-  --duration: 160ms;
 }
 
 /* Night: the dark theme. System setting, unless the player picked day */

@@ -313,7 +313,10 @@
 
     const api = {
       reset() {
-        s.loop?.kill?.();
+        // Stop pieces still falling from the last round
+        g?.killTweensOf(s.part);
+        g?.killTweensOf(s);
+        s.loop = null;
         for (let i = 1; i <= 7; i++) s.part[i] = 0;
         s.hy = HY.ground;
         s.mood = "idle";

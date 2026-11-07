@@ -146,10 +146,11 @@ function startRound(el, { word, used = [], canGuess = true, onEnd } = {}) {
     }
   }
 
-  keyboardEl.addEventListener("click", (e) => {
+  // onclick replaces the previous round's handler on the same keyboard
+  keyboardEl.onclick = (e) => {
     const key = e.target.closest("[data-key]");
     if (key && canGuess) guess(key.dataset.key);
-  });
+  };
 
   function onKey(e) {
     if (!canGuess || e.ctrlKey || e.metaKey || e.altKey) return;
