@@ -1,0 +1,284 @@
+/*
+  Haru design tokens. A token changes here first, gets validated in the prototype,
+  and then moves to the app.
+
+  Look: medieval pixel art. Light theme is day, dark theme is night.
+  The --px-* colors are the pixel art palette, read by pixel.js to paint the world,
+  the gallows and Haru.
+
+  Mobile first: base styles are the phone, then min-width.
+    tablet-min   600px
+    desktop-min  960px
+  CSS variables don't work inside media queries, so breakpoints are written as
+  numbers and must be one of these two.
+*/
+
+:root {
+  /* UI raw colors */
+  --parchment: #f4e4c1;
+  --parchment-shade: #e6cf9f;
+  --parchment-edge: #8a5a34;
+  --ink-brown: #3b2416;
+  --ink-brown-soft: #6e4c33;
+  --crimson: #b33a3a;
+  --crimson-dark: #7a2222;
+  --gold: #e8b23a;
+  --gold-dark: #9a6a12;
+  --moss: #4f8a3a;
+  --moss-dark: #2f5a22;
+  --stone-panel: #2b2535;
+  --stone-panel-shade: #221d2b;
+  --stone-edge: #5c4f72;
+  --moonlight: #f1e2bd;
+  --moonlight-soft: #b7a78a;
+  --white: #ffffff;
+
+  /* UI roles: use these in components */
+  --bg-page: var(--px-sky-mid);
+  --panel: var(--parchment);
+  --panel-shade: var(--parchment-shade);
+  --panel-edge: var(--parchment-edge);
+  --text: var(--ink-brown);
+  --text-muted: var(--ink-brown-soft);
+  --title: var(--white);
+  --title-shadow: var(--px-outline);
+  --accent: var(--crimson);
+  --accent-dark: var(--crimson-dark);
+  --text-on-accent: var(--white);
+  --hit: var(--moss);
+  --hit-dark: var(--moss-dark);
+  --miss: var(--crimson);
+  --miss-dark: var(--crimson-dark);
+  --key: var(--parchment);
+  --key-shade: var(--parchment-shade);
+  --focus: var(--gold);
+  --bg-overlay: rgba(20, 12, 20, 0.6);
+
+  /* Pixel palette, day */
+  --px-sky-top: #5fa8e8;
+  --px-sky-mid: #8cc4f0;
+  --px-sky-low: #cfe6f2;
+  --px-sky-light: #ffe27a;
+  --px-cloud: #ffffff;
+  --px-cloud-shade: #d6e6f2;
+  --px-star: #ffffff;
+  --px-mountain: #8aa3c4;
+  --px-mountain-shade: #7189ad;
+  --px-hill: #6fae4f;
+  --px-hill-shade: #4f8a3a;
+  --px-stone: #c4bcae;
+  --px-stone-shade: #988f82;
+  --px-stone-dark: #6b645b;
+  --px-roof: #b94a3a;
+  --px-roof-shade: #8a3328;
+  --px-roof-blue: #3e5fb0;
+  --px-flag: #c43b3b;
+  --px-flag-alt: #e8b23a;
+  --px-wood: #8a5a34;
+  --px-wood-light: #b07a48;
+  --px-wood-dark: #5e3a22;
+  --px-wall: #efe2c4;
+  --px-window: #6b8fb5;
+  --px-window-lit: #ffd36b;
+  --px-tree: #3f7a3a;
+  --px-tree-shade: #2c5a2a;
+  --px-ground: #a8956f;
+  --px-ground-shade: #84724f;
+  --px-cobble: #c2b18c;
+  --px-water: #6fb5e8;
+  --px-water-light: #cfeaf8;
+  --px-flame: #f28a2e;
+  --px-flame-light: #ffd36b;
+  --px-awning: #c43b3b;
+  --px-awning-alt: #f4e4c1;
+  --px-outline: #2a1a12;
+  /* Haru */
+  --px-skin: #f2c29b;
+  --px-hair: #7a4a26;
+  --px-hair-light: #a8693a;
+  --px-tunic: #4f8a3a;
+  --px-tunic-shade: #3a6a2a;
+  --px-belt: #c9a86a;
+  --px-pants: #6b4a32;
+  --px-boots: #3b2416;
+  --px-eye: #2a1a12;
+  --px-cheek: #e88a8a;
+  --px-sweat: #8cc8f0;
+  --px-sparkle: #ffe27a;
+  --px-rope: #c9a86a;
+  --px-rope-shade: #8f7444;
+  --px-gold: #e8b23a;
+  /* Haru as a wizard */
+  --px-robe: #3b5fb0;
+  --px-robe-shade: #263f7a;
+  /* Haru as a knight */
+  --px-steel: #aab4c0;
+  --px-steel-shade: #6f7a88;
+  --px-tabard: #b33a3a;
+  --px-tabard-shade: #7a2222;
+  --px-plume: #e05a5a;
+
+  /* Type */
+  --font: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-pixel: "Pixelify Sans", var(--font);
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.5rem;
+  --text-3xl: 4rem;
+  --weight-regular: 400;
+  --weight-bold: 700;
+  --leading-tight: 1.1;
+  --leading-body: 1.55;
+  --tracking-blank: 0.08em;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+
+  /* Sizes */
+  --px: 4px; /* one UI pixel: borders, notched corners, button depth */
+  --page-max: 60rem;
+  --text-max: 40rem;
+  --dialog-max: 24rem;
+  --tile-min: 7.5rem;
+  --key-size: 2.75rem;
+  --slot-width: 1.3em;
+  --stage-height: 38vh; /* most the gallows scene takes on the game screen */
+  --world-height: 180; /* world canvas height in art pixels */
+  --sprite-sm: 2; /* Haru sprite scale: one art pixel = N CSS pixels */
+  --sprite-md: 4;
+  --sprite-lg: 6;
+
+  /* Radius: pixel art has no round corners, only the notch */
+  --notch: var(--px);
+
+  /* Shadow: hard pixel shadows only */
+  --shadow-panel: inset 0 calc(var(--px) * -1) 0 var(--panel-shade);
+  --shadow-button: inset 0 calc(var(--px) * -1) 0 var(--accent-dark);
+  --shadow-key: inset 0 calc(var(--px) * -1) 0 var(--key-shade);
+  /* Text on the sky: a pixel outline all around, plus a drop shadow */
+  --outline-px: calc(var(--px) / 2);
+  --shadow-title:
+    calc(var(--outline-px) * -1) calc(var(--outline-px) * -1) 0 var(--title-shadow),
+    0 calc(var(--outline-px) * -1) 0 var(--title-shadow),
+    var(--outline-px) calc(var(--outline-px) * -1) 0 var(--title-shadow),
+    calc(var(--outline-px) * -1) 0 0 var(--title-shadow),
+    var(--outline-px) 0 0 var(--title-shadow),
+    calc(var(--outline-px) * -1) var(--outline-px) 0 var(--title-shadow),
+    0 var(--outline-px) 0 var(--title-shadow),
+    var(--outline-px) var(--outline-px) 0 var(--title-shadow),
+    var(--px) var(--px) 0 var(--title-shadow);
+
+  /* Motion */
+  --duration: 160ms;
+}
+
+/* Night: the dark theme. System setting, unless the player picked day */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --panel: var(--stone-panel);
+    --panel-shade: var(--stone-panel-shade);
+    --panel-edge: var(--stone-edge);
+    --text: var(--moonlight);
+    --text-muted: var(--moonlight-soft);
+    --title: var(--moonlight);
+    --accent: var(--gold);
+    --accent-dark: var(--gold-dark);
+    --text-on-accent: var(--ink-brown);
+    --key: var(--stone-edge);
+    --key-shade: var(--stone-panel-shade);
+
+    --px-sky-top: #141433;
+    --px-sky-mid: #23234f;
+    --px-sky-low: #3a3466;
+    --px-sky-light: #f3ecd2;
+    --px-cloud: #3a3a66;
+    --px-cloud-shade: #2c2c55;
+    --px-star: #fff6d6;
+    --px-mountain: #2a2f55;
+    --px-mountain-shade: #22264a;
+    --px-hill: #23402f;
+    --px-hill-shade: #1a3024;
+    --px-stone: #5d5872;
+    --px-stone-shade: #47435a;
+    --px-stone-dark: #343046;
+    --px-roof: #6e2f3a;
+    --px-roof-shade: #4e202a;
+    --px-roof-blue: #2c3f78;
+    --px-flag: #8a2e3a;
+    --px-flag-alt: #b08a3a;
+    --px-wood: #4e3524;
+    --px-wood-light: #6a4a32;
+    --px-wood-dark: #33221a;
+    --px-wall: #6f6680;
+    --px-window: #2a2f55;
+    --px-tree: #1f3a2a;
+    --px-tree-shade: #152a1f;
+    --px-ground: #4a4258;
+    --px-ground-shade: #3a3346;
+    --px-cobble: #5a5168;
+    --px-water: #3a5a9a;
+    --px-water-light: #6f8fc8;
+    --px-awning: #7a2a34;
+    --px-awning-alt: #8f8296;
+    --px-outline: #120c14;
+  }
+}
+
+:root[data-theme="dark"] {
+  --panel: var(--stone-panel);
+  --panel-shade: var(--stone-panel-shade);
+  --panel-edge: var(--stone-edge);
+  --text: var(--moonlight);
+  --text-muted: var(--moonlight-soft);
+  --title: var(--moonlight);
+  --accent: var(--gold);
+  --accent-dark: var(--gold-dark);
+  --text-on-accent: var(--ink-brown);
+  --key: var(--stone-edge);
+  --key-shade: var(--stone-panel-shade);
+
+  --px-sky-top: #141433;
+  --px-sky-mid: #23234f;
+  --px-sky-low: #3a3466;
+  --px-sky-light: #f3ecd2;
+  --px-cloud: #3a3a66;
+  --px-cloud-shade: #2c2c55;
+  --px-star: #fff6d6;
+  --px-mountain: #2a2f55;
+  --px-mountain-shade: #22264a;
+  --px-hill: #23402f;
+  --px-hill-shade: #1a3024;
+  --px-stone: #5d5872;
+  --px-stone-shade: #47435a;
+  --px-stone-dark: #343046;
+  --px-roof: #6e2f3a;
+  --px-roof-shade: #4e202a;
+  --px-roof-blue: #2c3f78;
+  --px-flag: #8a2e3a;
+  --px-flag-alt: #b08a3a;
+  --px-wood: #4e3524;
+  --px-wood-light: #6a4a32;
+  --px-wood-dark: #33221a;
+  --px-wall: #6f6680;
+  --px-window: #2a2f55;
+  --px-tree: #1f3a2a;
+  --px-tree-shade: #152a1f;
+  --px-ground: #4a4258;
+  --px-ground-shade: #3a3346;
+  --px-cobble: #5a5168;
+  --px-water: #3a5a9a;
+  --px-water-light: #6f8fc8;
+  --px-awning: #7a2a34;
+  --px-awning-alt: #8f8296;
+  --px-outline: #120c14;
+}

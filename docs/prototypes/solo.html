@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Haru solo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pixelify+Sans:wght@400;700&display=swap">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="base.css">
+</head>
+<body data-scene="square">
+  <div class="page">
+    <header data-header></header>
+
+    <main class="board" id="round">
+      <div class="stage-wrap"><canvas class="stage"></canvas></div>
+      <div class="panel board__panel">
+        <span class="hint" id="category"></span>
+        <div class="word"></div>
+        <p class="misses"></p>
+        <div class="keyboard"></div>
+      </div>
+    </main>
+  </div>
+
+  <div class="overlay" id="end" hidden>
+    <div class="panel result" role="dialog" aria-labelledby="end-title">
+      <canvas class="sprite" data-size="md" data-mood="idle"></canvas>
+      <h2 id="end-title" data-when="win"><span lang="en">Haru is free!</span><span lang="pt-BR">O Haru está livre!</span></h2>
+      <h2 data-when="loss"><span lang="en">Haru didn't make it</span><span lang="pt-BR">Não deu para salvar o Haru</span></h2>
+      <p class="muted"><span lang="en">The word was</span><span lang="pt-BR">A palavra era</span></p>
+      <p class="result__word"></p>
+      <div class="result__actions">
+        <button class="btn btn--primary" id="again"><span lang="en">Play again</span><span lang="pt-BR">Jogar de novo</span></button>
+        <a class="btn btn--ghost" href="index.html"><span lang="en">Back home</span><span lang="pt-BR">Voltar ao início</span></a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="haru.js"></script>
+  <script src="pixel.js"></script>
+  <script>
+    // A sample of the solo lists. The full lists (about 150 words each) are issue #25.
+    const WORDS = {
+      en: [
+        ["animals", "GIRAFFE"], ["animals", "OCTOPUS"], ["food", "ICE CREAM"], ["food", "PANCAKE"],
+        ["countries", "PORTUGAL"], ["countries", "NEW ZEALAND"], ["objects", "UMBRELLA"],
+        ["objects", "TOOTHBRUSH"], ["jobs", "FIREFIGHTER"], ["jobs", "BAKER"],
+      ],
+      "pt-BR": [
+        ["animals", "TAMANDUÁ"], ["animals", "JABUTI"], ["food", "PÃO DE QUEIJO"], ["food", "AÇAÍ"],
+        ["countries", "JAPÃO"], ["countries", "GUINÉ-BISSAU"], ["objects", "GUARDA-CHUVA"],
+        ["objects", "ESCOVA"], ["jobs", "BOMBEIRO"], ["jobs", "COZINHEIRA"],
+      ],
+    };
+    const CATEGORIES = {
+      animals: ["Animals", "Animais"], food: ["Food", "Comida"], countries: ["Countries", "Países"],
+      objects: ["Objects", "Objetos"], jobs: ["Jobs", "Profissões"],
+    };
+
+    const roundEl = document.getElementById("round");
+    const endEl = document.getElementById("end");
+    let round;
+    let queue = [];
+
+    function next() {
+      // A word doesn't repeat until the list runs out
+      if (!queue.length) queue = [...WORDS[Haru.lang()]].sort(() => Math.random() - 0.5);
+      return queue.pop();
+    }
+
+    function play() {
+      round?.stop();
+      endEl.hidden = true;
+      const [category, word] = next();
+      const [en, pt] = CATEGORIES[category];
+      document.getElementById("category").innerHTML = `<span lang="en">${en}</span><span lang="pt-BR">${pt}</span>`;
+      round = Haru.startRound(roundEl, {
+        word,
+        onEnd({ won }) {
+          // Let the win or the trapdoor play before the dialog
+          setTimeout(() => {
+            endEl.querySelector(".sprite").dataset.mood = won ? "win" : "loss";
+            endEl.querySelectorAll("[data-when]").forEach((h) => (h.hidden = h.dataset.when !== (won ? "win" : "loss")));
+            endEl.querySelector(".result__word").textContent = word;
+            endEl.hidden = false;
+            document.getElementById("again").focus();
+          }, 1600);
+        },
+      });
+    }
+
+    document.getElementById("again").addEventListener("click", play);
+    document.addEventListener("haru:lang", () => { queue = []; play(); });
+    play();
+  </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How Haru works</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pixelify+Sans:wght@400;700&display=swap">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="base.css">
+</head>
+<body data-scene="market">
+  <div class="page">
+    <header data-header></header>
+
+    <main class="prose">
+      <h1 class="sky-text"><span lang="en">How it works</span><span lang="pt-BR">Como funciona</span></h1>
+
+      <section class="panel">
+        <h2><span lang="en">The game</span><span lang="pt-BR">O jogo</span></h2>
+        <div lang="en">
+          <p>Haru is on the gallows. The word shows as one blank per letter. Pick one letter at a time:</p>
+          <ul>
+            <li>If the letter is in the word, it shows everywhere it appears.</li>
+            <li>If it isn't, one more piece of the gallows goes up. On the 7th miss the trapdoor opens.</li>
+            <li>Accents don't count: picking A also reveals Á, Â, Ã and À, and C reveals Ç.</li>
+          </ul>
+          <p><strong>Solo:</strong> a random word, with its category as a hint.</p>
+          <p><strong>With a friend:</strong> one player picks the word and an optional hint, the other guesses. Roles swap every round and the room keeps the score.</p>
+        </div>
+        <div lang="pt-BR">
+          <p>O Haru está na forca. A palavra aparece com um espaço por letra. Escolha uma letra por vez:</p>
+          <ul>
+            <li>Se a letra está na palavra, ela aparece em todas as posições.</li>
+            <li>Se não está, mais uma peça da forca é montada. No 7º erro o alçapão abre.</li>
+            <li>Acentos não contam: escolher A revela também Á, Â, Ã e À, e C revela Ç.</li>
+          </ul>
+          <p><strong>Solo:</strong> uma palavra sorteada, com a categoria como dica.</p>
+          <p><strong>Com um amigo:</strong> um jogador escolhe a palavra e uma dica opcional, o outro adivinha. Os papéis trocam a cada rodada e a sala guarda o placar.</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Peer-to-peer</h2>
+        <p lang="en">In a game with a friend, the two browsers talk to each other directly. Haru's server only introduces them.</p>
+        <p lang="pt-BR">Numa partida com um amigo, os dois navegadores conversam direto. O servidor do Haru só apresenta um ao outro.</p>
+
+        <svg class="diagram" viewBox="0 0 360 250" role="img" aria-label="Two browsers connected by a data channel, with a signaling server above and a TURN relay below">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 Z" fill="var(--text-muted)"/>
+            </marker>
+          </defs>
+          <rect class="diagram__server" x="110" y="12" width="140" height="48"/>
+          <text class="diagram__server-text" x="180" y="34" text-anchor="middle" lang="en">Signaling</text>
+          <text class="diagram__server-text" x="180" y="34" text-anchor="middle" lang="pt-BR">Sinalização</text>
+          <text class="diagram__server-text" x="180" y="50" text-anchor="middle" lang="en">introduces the players</text>
+          <text class="diagram__server-text" x="180" y="50" text-anchor="middle" lang="pt-BR">apresenta os jogadores</text>
+
+          <rect class="diagram__box" x="6" y="150" width="128" height="52"/>
+          <text x="70" y="174" text-anchor="middle" lang="en">Your browser</text>
+          <text x="70" y="174" text-anchor="middle" lang="pt-BR">Seu navegador</text>
+          <text class="diagram__muted" x="70" y="190" text-anchor="middle">Laura</text>
+
+          <rect class="diagram__box" x="226" y="150" width="128" height="52"/>
+          <text x="290" y="174" text-anchor="middle" lang="en">Friend's browser</text>
+          <text x="290" y="174" text-anchor="middle" lang="pt-BR">Navegador do amigo</text>
+          <text class="diagram__muted" x="290" y="190" text-anchor="middle">Ana</text>
+
+          <path class="diagram__arrow" d="M76 144 L140 66" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+          <path class="diagram__arrow" d="M284 144 L220 66" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+          <text class="diagram__muted" x="96" y="100" text-anchor="end">1</text>
+          <text class="diagram__muted" x="264" y="100">1</text>
+
+          <path class="diagram__channel" d="M138 176 H222"/>
+          <text x="180" y="166" text-anchor="middle" lang="en">2 · moves</text>
+          <text x="180" y="166" text-anchor="middle" lang="pt-BR">2 · jogadas</text>
+
+          <path class="diagram__relay" d="M90 208 Q180 250 270 208"/>
+          <text class="diagram__muted" x="180" y="244" text-anchor="middle" lang="en">TURN relay, only if the direct path is blocked</text>
+          <text class="diagram__muted" x="180" y="244" text-anchor="middle" lang="pt-BR">TURN repassa, só se o caminho direto estiver bloqueado</text>
+        </svg>
+
+        <ol lang="en">
+          <li><strong>Signaling.</strong> Each browser tells the server how it can be reached. The server passes this on to the other player. STUN helps each browser find its public address.</li>
+          <li><strong>Data channel.</strong> The browsers open a WebRTC channel between them and the moves go through it. If a network blocks the direct path, a TURN server relays the moves.</li>
+        </ol>
+        <ol lang="pt-BR">
+          <li><strong>Sinalização.</strong> Cada navegador conta ao servidor como pode ser encontrado, e o servidor repassa isso ao outro jogador. O STUN ajuda cada navegador a descobrir o próprio endereço público.</li>
+          <li><strong>Canal de dados.</strong> Os navegadores abrem um canal WebRTC entre eles e as jogadas passam por ali. Se uma rede bloqueia o caminho direto, um servidor TURN repassa as jogadas.</li>
+        </ol>
+        <p lang="en">The server stores nothing. The room only exists in memory while it is open.</p>
+        <p lang="pt-BR">O servidor não guarda nada. A sala só existe na memória enquanto está aberta.</p>
+      </section>
+
+      <p class="center" style="margin-top: var(--space-5)"><a class="btn btn--primary" href="index.html"><span lang="en">Play now</span><span lang="pt-BR">Jogar agora</span></a></p>
+    </main>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="haru.js"></script>
+  <script src="pixel.js"></script>
+</body>
+</html>
