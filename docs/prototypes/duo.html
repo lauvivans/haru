@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Haru with a friend</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pixelify+Sans:wght@400;700&display=swap">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="base.css">
+</head>
+<body data-scene="square">
+  <div class="page">
+    <header data-header></header>
+
+    <nav class="proto-states" aria-label="Prototype states">
+      <span>Prototype states:</span>
+      <button class="btn btn--ghost btn--small" data-show="pick">Laura picks</button>
+      <button class="btn btn--ghost btn--small" data-show="guess">Ana guesses</button>
+      <button class="btn btn--ghost btn--small" data-show="watch">Laura watches</button>
+      <button class="btn btn--ghost btn--small" data-show="end">End of round</button>
+    </nav>
+
+    <!-- Score of the session, on every state -->
+    <div class="score">
+      <span class="player">Laura <span class="player__role" id="role-laura"></span></span>
+      <span class="score__points" id="points">1 × 1</span>
+      <span class="player">Ana <span class="player__role" id="role-ana"></span></span>
+    </div>
+
+    <main>
+      <!-- The picker types the word, hidden -->
+      <section class="panel narrow stack" data-state="pick">
+        <canvas class="sprite" data-size="md" data-mood="miss"></canvas>
+        <h1 class="center"><span lang="en">Pick a word for Ana</span><span lang="pt-BR">Escolha uma palavra para a Ana</span></h1>
+        <div class="field">
+          <label for="secret"><span lang="en">Word</span><span lang="pt-BR">Palavra</span></label>
+          <div class="input-row">
+            <input class="input" id="secret" type="password" maxlength="24" value="GUARDA-CHUVA" autocomplete="off">
+            <button class="btn btn--ghost" id="reveal" aria-pressed="false"><span lang="en">Show</span><span lang="pt-BR">Mostrar</span></button>
+          </div>
+          <span class="field__hint"><span lang="en">2 to 24 characters: letters, spaces and hyphens. Accents are fine.</span><span lang="pt-BR">De 2 a 24 caracteres: letras, espaços e hífens. Pode ter acento.</span></span>
+        </div>
+        <div class="field">
+          <label for="tip"><span lang="en">Hint (optional)</span><span lang="pt-BR">Dica (opcional)</span></label>
+          <input class="input" id="tip" maxlength="40" value="Rainy day" autocomplete="off">
+          <span class="field__hint"><span lang="en">Up to 40 characters.</span><span lang="pt-BR">Até 40 caracteres.</span></span>
+        </div>
+        <button class="btn btn--primary btn--block" data-go="watch"><span lang="en">Start round</span><span lang="pt-BR">Começar rodada</span></button>
+      </section>
+
+      <!-- The guesser plays; this one is playable -->
+      <section class="board" data-state="guess" id="guess">
+        <p class="status"><span lang="en">Laura picked the word. Save Haru!</span><span lang="pt-BR">A Laura escolheu a palavra. Salve o Haru!</span></p>
+        <div class="stage-wrap"><canvas class="stage"></canvas></div>
+        <div class="panel board__panel">
+          <span class="hint">Rainy day</span>
+          <div class="word"></div>
+          <p class="misses"></p>
+          <div class="keyboard"></div>
+        </div>
+      </section>
+
+      <!-- The picker sees the same board but can't pick letters -->
+      <section class="board" data-state="watch" id="watch">
+        <p class="status"><span lang="en">Ana is guessing your word…</span><span lang="pt-BR">A Ana está adivinhando sua palavra…</span></p>
+        <div class="stage-wrap"><canvas class="stage"></canvas></div>
+        <div class="panel board__panel">
+          <span class="hint">Rainy day</span>
+          <div class="word"></div>
+          <p class="misses"></p>
+          <div class="keyboard"></div>
+        </div>
+      </section>
+
+      <!-- End of a two-player round -->
+      <section class="panel narrow result stack" data-state="end">
+        <canvas class="sprite" data-size="md" data-mood="win"></canvas>
+        <h1><span lang="en">Ana saved Haru!</span><span lang="pt-BR">A Ana salvou o Haru!</span></h1>
+        <p class="muted"><span lang="en">The word was</span><span lang="pt-BR">A palavra era</span></p>
+        <p class="result__word">GUARDA-CHUVA</p>
+        <p><span lang="en">Next round: Ana picks the word.</span><span lang="pt-BR">Próxima rodada: a Ana escolhe a palavra.</span></p>
+        <div class="result__actions">
+          <button class="btn btn--primary" data-go="pick"><span lang="en">Next round</span><span lang="pt-BR">Próxima rodada</span></button>
+          <a class="btn btn--ghost" href="index.html"><span lang="en">Leave room</span><span lang="pt-BR">Sair da sala</span></a>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="haru.js"></script>
+  <script src="pixel.js"></script>
+  <script>
+    const WORD = "GUARDA-CHUVA";
+    const PICKS = '<span lang="en">picks</span><span lang="pt-BR">escolhe</span>';
+    const GUESSES = '<span lang="en">guesses</span><span lang="pt-BR">adivinha</span>';
+    let rounds = [];
+
+    document.getElementById("role-laura").innerHTML = PICKS;
+    document.getElementById("role-ana").innerHTML = GUESSES;
+
+    document.addEventListener("haru:state", ({ detail }) => {
+      rounds.forEach((r) => r.stop());
+      rounds = [];
+      document.getElementById("points").textContent = detail === "end" ? "1 × 2" : "1 × 1";
+      if (detail === "guess") {
+        rounds.push(Haru.startRound(document.getElementById("guess"), {
+          word: WORD,
+          onEnd: () => setTimeout(() => document.querySelector('[data-show="end"]').click(), 1600),
+        }));
+      }
+      if (detail === "watch") {
+        rounds.push(Haru.startRound(document.getElementById("watch"), { word: WORD, canGuess: false, used: ["A", "E", "R", "T", "O"] }));
+      }
+    });
+
+    // Re-run the current state now that the listener exists
+    document.querySelector('[data-show][aria-pressed="true"]').click();
+
+    document.getElementById("reveal").addEventListener("click", (e) => {
+      const input = document.getElementById("secret");
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      e.currentTarget.setAttribute("aria-pressed", String(show));
+    });
+  </script>
+</body>
+</html>
