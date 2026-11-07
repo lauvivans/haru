@@ -8,8 +8,12 @@ Everything in the repository and on GitHub is in English: code, docs, file names
 
 ## Structure
 
-- `client/`: the React app (Vite).
-- `server/`: the signaling server (Fastify + WebSocket). It only helps two peers find each other; game moves go over the WebRTC data channel.
+One Cloudflare Worker project at the repo root.
+
+- `src/`: the React app (Vite SPA), served by the Worker as static assets.
+- `worker/`: the Worker entry and the `Room` Durable Object, one per room, for signaling. It only helps two peers find each other; game moves go over the WebRTC data channel.
+- `wrangler.jsonc`: Worker config (assets, Durable Object binding `ROOMS`). `npm run cf-typegen` generates `worker-configuration.d.ts`, which is not committed.
+- `npm run dev` runs the client and the Worker together through the Cloudflare Vite plugin. Node version is in `.nvmrc`.
 - `docs/decisions/`: one decision per file, numbered. Every spike ends with a file here.
 - `docs/product/requirements.md`: what the game does and its rules.
 - `docs/prototypes/`: HTML prototype, the visual reference for screens, tokens and the character.
@@ -20,7 +24,7 @@ Change the prototype first, validate it, then implement it in the app. Haru is o
 
 ## Stack and hosting
 
-Pending the spike in issue #2. The goal is to spend as close to zero as possible.
+Decision 001: client and signaling on one Cloudflare Worker, one Durable Object per room, STUN plus Cloudflare TURN. The goal is to spend as close to zero as possible.
 
 ## Workflow
 
