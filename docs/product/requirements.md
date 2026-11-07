@@ -11,10 +11,19 @@ What Haru does and the rules the game follows.
 - It works on a phone and on a computer. On a computer, the physical keyboard types letters too.
 - The player can switch between a light and a dark theme. The first visit follows the system setting, and the choice is kept in the browser.
 
-## Home
+## Landing
 
-- Shows Haru, the game's name and two buttons: play solo and play with a friend.
+- The landing is the home of the game, at `/` and `/pt-BR/`. It is public, like every page of Haru.
+- It shows Haru, the game's name, a short description and the two modes, each with its play button: play solo and play with a friend.
+- A link to How it works.
 - A language switch (EN / PT) and a theme switch.
+
+## How it works
+
+- A page at `/how-it-works` (and `/pt-BR/how-it-works`) that explains the game in plain words.
+- **The game:** the rules of a round, the solo mode and the two-player mode.
+- **Peer-to-peer:** how two browsers connect in Haru, with a diagram. The server only introduces the players (signaling). STUN helps each browser find its public address, and TURN relays the moves when a direct path is blocked. After that, the moves go through a WebRTC data channel between the two browsers. The server stores nothing.
+- It stays short. The deeper study notes on WebRTC live in the README.
 
 ## Rules of a round
 
