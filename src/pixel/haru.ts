@@ -3,8 +3,7 @@ import { gsap } from "gsap";
 import { stored } from "@/stored";
 import { reduced, to, token, pen, onFrame, type Pen } from "@/pixel/core";
 
-export const MOODS = ["idle", "hit", "miss", "win", "loss"] as const;
-export type Mood = (typeof MOODS)[number];
+export type Mood = "idle" | "hit" | "miss" | "win" | "loss";
 
 type LookParts = {
   head: string;
