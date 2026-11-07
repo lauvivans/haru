@@ -1,4 +1,3 @@
-import { Link } from "react-router";
 import { useStored } from "@/stored";
 import { theme, type Theme } from "@/theme";
 
@@ -18,18 +17,5 @@ export function ThemeSwitch() {
         </button>
       ))}
     </div>
-  );
-}
-
-export function Header() {
-  return (
-    <header className="header">
-      <Link className="logo" to="/">
-        Haru
-      </Link>
-      <div className="header__tools">
-        <ThemeSwitch />
-      </div>
-    </header>
   );
 }

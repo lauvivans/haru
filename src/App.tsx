@@ -1,10 +1,10 @@
 import SocketProvider from "@/context/SocketContext";
 import PeerConnectionProvider from "@/context/PeerConnectionContext";
-import Welcome from "@/components/welcome/Welcome";
+import Welcome from "@/components/game/Welcome/Welcome";
 import { BrowserRouter, Route, Routes } from "react-router";
-import Hangman from "@/components/hangman/Hangman";
-import { Header } from "@/components/ui/Header";
-import { World } from "@/components/pixel/World";
+import Hangman from "@/components/game/Hangman/Hangman";
+import { Header } from "@/components/game/Header/Header";
+import { World } from "@/components/game/World/World";
 
 function App() {
   return (

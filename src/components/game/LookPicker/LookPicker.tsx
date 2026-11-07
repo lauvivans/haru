@@ -1,6 +1,6 @@
 import { useStored } from "@/stored";
 import { look, LOOK_NAMES, type Look } from "@/pixel/haru";
-import { Haru } from "@/components/pixel/Haru";
+import { Haru } from "@/components/game/Haru/Haru";
 
 const LABELS: Record<Look, string> = { villager: "Villager", wizard: "Wizard", knight: "Knight" };
 

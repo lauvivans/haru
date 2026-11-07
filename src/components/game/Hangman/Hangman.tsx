@@ -2,7 +2,7 @@ import "./Hangman.css";
 import { useSocket } from "@/context/SocketContext";
 import useChannel from "@/hooks/useChannel";
 import { useMemo, useRef } from "react";
-import { Gallows } from "@/components/pixel/Gallows";
+import { Gallows } from "@/components/game/Gallows/Gallows";
 
 const ALPHABET = [
   "A",
