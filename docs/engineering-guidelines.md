@@ -11,6 +11,7 @@ Haru is only a game. Keep the code, the design system and the character small an
 - Before creating something, look for what already exists in the codebase and in the dependencies.
 - A new dependency needs a justification in the PR and a supply chain check (new packages in the lockfile, install scripts, `npm audit signatures`, publish dates, `npm audit`), reported in the review.
 - Readable beats clever. Names describe what the thing is.
+- Code is formatted with Prettier (`npm run format`). Review doesn't comment on spacing or quotes; CI checks the files a PR changes.
 
 ## Scope of a PR
 
@@ -144,7 +145,7 @@ How:
 - Mock only the edges: WebRTC, the signaling socket, `localStorage`, `matchMedia`, the canvas. Don't mock child components, contexts or internal helpers.
 - Reset mocks between tests (`vi.restoreAllMocks()` in `afterEach`).
 - One top-level `describe` naming what is under test. Nested `describe` blocks only to separate contexts.
-- Before opening the PR, `npm run typecheck`, `npm run lint`, the tests and `npm run build` pass. CI runs the same checks on every PR. The code left from the Fastify version that still fails lint (`src/context/`, the old `Welcome` screen) is in the ESLint ignores until it is replaced.
+- Before opening the PR, `npm run typecheck`, `npm run lint`, `npm run format:check`, the tests and `npm run build` pass. CI runs the same checks on every PR. The code left from the Fastify version that still fails lint (`src/context/`, the old `Welcome` screen) is in the ESLint ignores until it is replaced.
 
 ## Reviewing a PR
 
