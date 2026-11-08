@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { cloudflareTest } from "@cloudflare/vitest-plugin";
 import { defineConfig } from "vitest/config";
 
@@ -10,7 +11,8 @@ export default defineConfig({
         test: { name: "worker", include: ["worker/**/*.spec.ts"] },
       },
       {
-        test: { name: "app", include: ["src/**/*.spec.ts"] },
+        resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
+        test: { name: "app", include: ["src/**/*.spec.{ts,tsx}"], environment: "jsdom" },
       },
     ],
   },

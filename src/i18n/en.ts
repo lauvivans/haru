@@ -15,6 +15,14 @@ export const en = {
     wizard: "Wizard",
     knight: "Knight",
   },
+  round: {
+    misses: (n: number, max: number) => `Misses: ${n} of ${max}`,
+    won: "Haru is free!",
+    lost: "Haru didn't make it",
+    wordWas: "The word was",
+    playAgain: "Play again",
+    backHome: "Back home",
+  },
 };
 
 export type Strings = typeof en;
