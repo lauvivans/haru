@@ -1,9 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import {
   isHint,
   isWord,
   picksRound,
   play,
+  saveScore,
+  savedScore,
   scoreOf,
   tidyWord,
   type DuoRound,
@@ -121,6 +123,49 @@ describe('duo', () => {
       );
       expect(scoreOf(rounds, true)).toEqual({ me: 0, peer: 2 });
       expect(scoreOf(rounds, false)).toEqual({ me: 2, peer: 0 });
+    });
+
+    it('adds the rounds to the score kept from before', () => {
+      const rounds = playAll(
+        [
+          [word('pé'), true],
+          [guess('P'), false],
+          [guess('E'), false],
+        ],
+        true,
+      );
+      expect(scoreOf(rounds, true, { me: 3, peer: 1 })).toEqual({ me: 3, peer: 2 });
+    });
+  });
+
+  describe('savedScore', () => {
+    afterEach(() => localStorage.clear());
+
+    it('reads back the score saved for a room, whatever the case of the code', () => {
+      saveScore('k7qxab', 'Laura', { me: 2, peer: 1 });
+      expect(savedScore('K7QXAB', 'Laura')).toEqual({ me: 2, peer: 1 });
+      expect(savedScore('ZZZZZZ', 'Laura')).toEqual({ me: 0, peer: 0 });
+    });
+
+    it('keeps each side apart when both players share one browser', () => {
+      saveScore('K7QXAB', 'Laura', { me: 0, peer: 1 });
+      saveScore('K7QXAB', 'Ana', { me: 1, peer: 0 });
+      expect(savedScore('K7QXAB', 'Laura')).toEqual({ me: 0, peer: 1 });
+      expect(savedScore('K7QXAB', 'Ana')).toEqual({ me: 1, peer: 0 });
+    });
+
+    it('drops a saved score that the game could not have written', () => {
+      for (const saved of [
+        '{',
+        '[1,2]',
+        '{"me":-1,"peer":0}',
+        '{"me":1.5,"peer":0}',
+        '{"me":"2","peer":0}',
+        '{"me":10001,"peer":0}',
+      ]) {
+        localStorage.setItem('haru-score-K7QXAB-Laura', saved);
+        expect(savedScore('K7QXAB', 'Laura')).toEqual({ me: 0, peer: 0 });
+      }
     });
   });
 });

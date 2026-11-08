@@ -157,23 +157,51 @@ describe('Room', () => {
     expect(screen.getAllByRole('button', { name: 'A' })[0].hasAttribute('disabled')).toBe(true);
   });
 
-  it('goes back to the invite when the friend leaves, and connects again when they return', async () => {
+  async function playWithAna() {
     nickname.set('Laura');
-    setup(`/room/${CODE}`);
-    await userEvent.click(screen.getByRole('button', { name: 'Join room' }));
+    const user = setup(`/room/${CODE}`);
+    await user.click(screen.getByRole('button', { name: 'Join room' }));
     await fromServer({ type: 'peer-joined' });
     await openChannel();
     await fromPeer({ type: 'hello', nickname: 'Ana' });
+    return user;
+  }
+
+  it('tells the player the friend left, waits, and keeps the score when they return', async () => {
+    const user = await playWithAna();
     // Joined by link, but was in the room first, so picks first
-    expect(screen.getByRole('heading', { name: 'Pick a word for Ana' })).toBeTruthy();
+    await user.type(screen.getByLabelText('Word'), 'pé');
+    await user.click(screen.getByRole('button', { name: 'Start round' }));
+    await fromPeer({ type: 'guess', letter: 'P' });
+    await fromPeer({ type: 'guess', letter: 'E' });
 
     await fromServer({ type: 'peer-disconnected' });
+    expect(screen.getByRole('heading', { name: 'Ana left the room' })).toBeTruthy();
+    expect(screen.getByText('Laura 0 × 1 Ana')).toBeTruthy();
+
+    await user.click(screen.getByRole('button', { name: 'Wait in the room' }));
     expect(screen.getByRole('heading', { name: 'Invite a friend' })).toBeTruthy();
 
     const first = FakePeer.last;
     await fromServer({ type: 'peer-joined' });
     expect(FakePeer.last).not.toBe(first);
     expect(FakeSocket.last.sent.filter((s) => s.type === 'offer')).toHaveLength(2);
+    await openChannel();
+    await fromPeer({ type: 'hello', nickname: 'Ana' });
+
+    // A new round, and the one who stayed picks first
+    expect(screen.getByRole('heading', { name: 'Pick a word for Ana' })).toBeTruthy();
+    expect(document.querySelector('.score__points')?.textContent).toBe('0 × 1');
+
+    await fromServer({ type: 'peer-disconnected' });
+    expect(screen.getByRole('heading', { name: 'Ana left the room' })).toBeTruthy();
+  });
+
+  it('lets the player go back home when the friend leaves', async () => {
+    await playWithAna();
+    await fromServer({ type: 'peer-disconnected' });
+
+    expect(screen.getByRole('link', { name: 'Back home' }).getAttribute('href')).toBe('/');
   });
 
   it('tells the player when the room could not be created', async () => {

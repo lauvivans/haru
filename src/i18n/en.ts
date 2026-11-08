@@ -70,6 +70,14 @@ export const en = {
       create: 'Create a room',
       solo: 'Play solo',
     },
+    left: {
+      title: (name: string) => `${name} left the room`,
+      intro: (name: string) =>
+        `The connection was lost. You can wait for ${name} to come back with the same link, or go back home.`,
+      score: 'Score',
+      wait: 'Wait in the room',
+      home: 'Back home',
+    },
   },
   duo: {
     picks: 'picks',
