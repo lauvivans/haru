@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { Hint } from "@/components/ui/Hint/Hint";
 import { Panel } from "@/components/ui/Panel/Panel";
 import type { Mood } from "@/pixel/haru";
-import { letterOfKey, MAX_MISSES, roundOf } from "@/round";
+import { letterOfKey, MAX_MISSES, roundOf, type Status } from "@/round";
 import { useLocale, useStrings } from "@/i18n/i18n";
 import { pathIn } from "@/i18n/locale";
 
@@ -25,6 +25,13 @@ interface RoundProps {
   onPlayAgain: () => void;
 }
 
+function moodOf(status: Status, lastGuess: string | undefined, hit: (letter: string) => boolean): Mood {
+  if (status === "won") return "win";
+  if (status === "lost") return "loss";
+  if (lastGuess === undefined) return "idle";
+  return hit(lastGuess) ? "hit" : "miss";
+}
+
 export function Round({ word, hint, guesses, canGuess = true, onGuess, onPlayAgain }: RoundProps) {
   const t = useStrings().round;
   const locale = useLocale();
@@ -35,9 +42,7 @@ export function Round({ word, hint, guesses, canGuess = true, onGuess, onPlayAga
   const used: Record<string, KeyState> = Object.fromEntries(
     guesses.map((g) => [g, hit(g) ? "hit" : "miss"]),
   );
-  const last = guesses.at(-1);
-  const mood: Mood =
-    status === "won" ? "win" : status === "lost" ? "loss" : last === undefined ? "idle" : hit(last) ? "hit" : "miss";
+  const mood = moodOf(status, guesses.at(-1), hit);
 
   function pick(letter: string) {
     if (!canGuess || over || guesses.includes(letter)) return;
@@ -101,7 +106,7 @@ export function Round({ word, hint, guesses, canGuess = true, onGuess, onPlayAga
       {endShown && (
         <div className="overlay">
           <Panel className="result" role="dialog" aria-labelledby="round-end">
-            <Haru mood={status === "won" ? "win" : "loss"} />
+            <Haru mood={mood} />
             <h2 id="round-end">{status === "won" ? t.won : t.lost}</h2>
             <p className="muted">{t.wordWas}</p>
             <p className="result__word">{word.toUpperCase()}</p>
