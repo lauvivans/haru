@@ -11,9 +11,8 @@ export default defineConfig([
     'dist',
     '.wrangler',
     'worker-configuration.d.ts',
-    // TODO(#27): lint again once #27 and #31 replace this Fastify-era code.
+    // TODO(#27): lint again once #27 replaces this Fastify-era code.
     'src/context',
-    'src/components/game/Welcome',
   ]),
   {
     files: ['**/*.{ts,tsx}'],

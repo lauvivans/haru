@@ -9,6 +9,23 @@ export const en = {
     light: 'Day',
     dark: 'Night',
   },
+  landing: {
+    tagline:
+      "Save Haru from the gallows: guess the word before it's built. Alone or with a friend.",
+    cycleMoods: "Click to see Haru's reactions",
+    chooseLook: 'Choose your Haru',
+    solo: {
+      title: 'Solo',
+      description: 'A random word from the village scrolls, with its category as a hint.',
+      play: 'Play solo',
+    },
+    friend: {
+      title: 'With a friend',
+      description: 'One picks the word, the other guesses. Send the room link and take turns.',
+      play: 'Play with a friend',
+    },
+    howItWorks: 'How it works',
+  },
   lookPicker: {
     label: "Haru's look",
     villager: 'Villager',
