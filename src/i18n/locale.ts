@@ -3,8 +3,11 @@ export type Locale = "en" | "pt-BR";
 const PT_PREFIX = "/pt-BR";
 
 // `/pt-BR/...` is Portuguese, everything else English (decision 002).
+// Case-insensitive, like React Router's route matching.
 export function localeOf(pathname: string): Locale {
-  return pathname === PT_PREFIX || pathname.startsWith(`${PT_PREFIX}/`) ? "pt-BR" : "en";
+  const path = pathname.toLowerCase();
+  const prefix = PT_PREFIX.toLowerCase();
+  return path === prefix || path.startsWith(`${prefix}/`) ? "pt-BR" : "en";
 }
 
 export function pathIn(locale: Locale, pathname: string): string {

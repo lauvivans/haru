@@ -8,6 +8,8 @@ describe("locale", () => {
     ["/pt-BR", "pt-BR"],
     ["/pt-BR/", "pt-BR"],
     ["/pt-BR/room/ABC234", "pt-BR"],
+    ["/pt-br/", "pt-BR"],
+    ["/PT-BR/room/ABC234", "pt-BR"],
     ["/pt-BRx/room", "en"],
     ["/room/pt-BR", "en"],
   ])("reads the locale of %s as %s", (pathname, locale) => {
@@ -22,6 +24,8 @@ describe("locale", () => {
     ["/pt-BR/room/ABC234", "en", "/room/ABC234"],
     ["/room/ABC234", "en", "/room/ABC234"],
     ["/pt-BR/room/ABC234", "pt-BR", "/pt-BR/room/ABC234"],
+    ["/pt-br/room/ABC234", "en", "/room/ABC234"],
+    ["/pt-br/room/ABC234", "pt-BR", "/pt-BR/room/ABC234"],
   ] as const)("opens %s in %s as %s", (pathname, locale, path) => {
     expect(pathIn(locale, pathname)).toBe(path);
   });
