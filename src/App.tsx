@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { BrowserRouter, Outlet, Route, Routes, useLocation } from 'react-router';
 import SocketProvider from '@/context/SocketContext';
 import PeerConnectionProvider from '@/context/PeerConnectionContext';
-import Welcome from '@/components/game/Welcome/Welcome';
 import Hangman from '@/components/game/Hangman/Hangman';
+import { Landing } from '@/components/game/Landing/Landing';
 import { Header } from '@/components/game/Header/Header';
 import { Solo } from '@/components/game/Solo/Solo';
 import { World } from '@/components/game/World/World';
@@ -43,7 +43,7 @@ function App() {
         <PeerConnectionProvider>
           <Routes>
             <Route path="pt-BR?" element={<Layout />}>
-              <Route index element={<Welcome />} />
+              <Route index element={<Landing />} />
               <Route path="solo" element={<Solo />} />
               <Route path="hangman" element={<Hangman />} />
             </Route>

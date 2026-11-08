@@ -9,6 +9,24 @@ export const ptBR: Strings = {
     light: 'Dia',
     dark: 'Noite',
   },
+  landing: {
+    tagline:
+      'Salve o Haru da forca: descubra a palavra antes de ela ficar pronta. Sozinho ou com um amigo.',
+    cycleMoods: 'Clique para ver as reações do Haru',
+    chooseLook: 'Escolha seu Haru',
+    solo: {
+      title: 'Solo',
+      description: 'Uma palavra sorteada dos pergaminhos da vila, com a categoria como dica.',
+      play: 'Jogar sozinho',
+    },
+    friend: {
+      title: 'Com um amigo',
+      description:
+        'Um escolhe a palavra e o outro tenta adivinhar. Mande o link da sala e revezem.',
+      play: 'Jogar com um amigo',
+    },
+    howItWorks: 'Como funciona',
+  },
   lookPicker: {
     label: 'Visual do Haru',
     villager: 'Aldeão',
