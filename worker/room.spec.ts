@@ -10,6 +10,13 @@ const candidate = {
   data: { candidate: "candidate:1 1 udp 1 192.0.2.1 5000 typ host", sdpMid: "0" },
 };
 
+interface Player {
+  socket: WebSocket;
+  messages: unknown[];
+  closeCode?: number;
+  send: (message: unknown) => void;
+}
+
 const openSockets: WebSocket[] = [];
 
 async function newRoom() {
@@ -25,13 +32,20 @@ async function join(code: string) {
   const socket = response.webSocket;
   if (!socket) throw new Error(`No WebSocket, status ${response.status}`);
 
-  const messages: unknown[] = [];
+  const player: Player = {
+    socket,
+    messages: [],
+    send: (message) => socket.send(JSON.stringify(message)),
+  };
   socket.addEventListener("message", (event) => {
-    if (typeof event.data === "string") messages.push(JSON.parse(event.data));
+    if (typeof event.data === "string") player.messages.push(JSON.parse(event.data));
+  });
+  socket.addEventListener("close", (event) => {
+    player.closeCode = event.code;
   });
   socket.accept();
   openSockets.push(socket);
-  return { socket, messages, send: (message: unknown) => socket.send(JSON.stringify(message)) };
+  return player;
 }
 
 async function joinPair() {
@@ -77,12 +91,9 @@ describe("Room", () => {
   it("tells a third player the room is full and closes their socket", async () => {
     const { code, first, second } = await joinPair();
     const third = await join(code);
-    const closed = new Promise<number>((resolve) =>
-      third.socket.addEventListener("close", (event) => resolve(event.code)),
-    );
 
     await vi.waitFor(() => expect(third.messages).toEqual([{ type: "room-full" }]));
-    expect(await closed).toBe(1008);
+    await vi.waitFor(() => expect(third.closeCode).toBe(1008));
 
     first.send(offer);
     await vi.waitFor(() => expect(second.messages).toEqual([offer]));
@@ -97,9 +108,14 @@ describe("Room", () => {
       expect(first.messages).toEqual([{ type: "peer-joined" }, { type: "peer-disconnected" }]),
     );
 
-    const back = await join(code);
-    expect(back.messages).not.toContainEqual({ type: "room-full" });
-    await vi.waitFor(() => expect(first.messages).toHaveLength(3));
+    await join(code);
+    await vi.waitFor(() =>
+      expect(first.messages).toEqual([
+        { type: "peer-joined" },
+        { type: "peer-disconnected" },
+        { type: "peer-joined" },
+      ]),
+    );
   });
 
   it("drops messages that are not signaling", async () => {
