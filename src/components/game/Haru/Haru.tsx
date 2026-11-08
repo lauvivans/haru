@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { mountSprite, type Look, type Mood, type SpriteSize } from "@/pixel/haru";
+import { useEffect, useRef } from 'react';
+import { mountSprite, type Look, type Mood, type SpriteSize } from '@/pixel/haru';
 
 type Props = {
   mood?: Mood;
@@ -10,7 +10,7 @@ type Props = {
 };
 
 // Haru alone, for the landing, cards and dialogs
-export function Haru({ mood = "idle", guesses = 0, size = "md", look, onClick }: Props) {
+export function Haru({ mood = 'idle', guesses = 0, size = 'md', look, onClick }: Props) {
   const ref = useRef<HTMLCanvasElement>(null);
   const sprite = useRef<ReturnType<typeof mountSprite>>(null);
 

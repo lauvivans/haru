@@ -1,10 +1,10 @@
-import { useLocation, useNavigate } from "react-router";
-import { useLocale, useStrings } from "@/i18n/i18n";
-import { pathIn, type Locale } from "@/i18n/locale";
+import { useLocation, useNavigate } from 'react-router';
+import { useLocale, useStrings } from '@/i18n/i18n';
+import { pathIn, type Locale } from '@/i18n/locale';
 
 const LOCALES: { value: Locale; label: string }[] = [
-  { value: "en", label: "EN" },
-  { value: "pt-BR", label: "PT" },
+  { value: 'en', label: 'EN' },
+  { value: 'pt-BR', label: 'PT' },
 ];
 
 // EN / PT. Opens the same page under the other prefix, so a room link keeps working.

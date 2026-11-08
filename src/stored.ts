@@ -1,8 +1,12 @@
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore } from 'react';
 
 // A value kept in localStorage that React and the pixel art can both read.
 // Storage can be blocked (private mode), so every access is guarded.
-export function stored<T extends string>(key: string, initial: () => T, isValid: (v: string) => v is T) {
+export function stored<T extends string>(
+  key: string,
+  initial: () => T,
+  isValid: (v: string) => v is T,
+) {
   let value: T = initial();
   try {
     const saved = localStorage.getItem(key);

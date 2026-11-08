@@ -1,23 +1,23 @@
-import { useEffect } from "react";
-import { BrowserRouter, Outlet, Route, Routes, useLocation } from "react-router";
-import SocketProvider from "@/context/SocketContext";
-import PeerConnectionProvider from "@/context/PeerConnectionContext";
-import Welcome from "@/components/game/Welcome/Welcome";
-import Hangman from "@/components/game/Hangman/Hangman";
-import { Header } from "@/components/game/Header/Header";
-import { Solo } from "@/components/game/Solo/Solo";
-import { World } from "@/components/game/World/World";
-import { useLocale } from "@/i18n/i18n";
-import { pathIn } from "@/i18n/locale";
-import type { Scene } from "@/pixel/world";
+import { useEffect } from 'react';
+import { BrowserRouter, Outlet, Route, Routes, useLocation } from 'react-router';
+import SocketProvider from '@/context/SocketContext';
+import PeerConnectionProvider from '@/context/PeerConnectionContext';
+import Welcome from '@/components/game/Welcome/Welcome';
+import Hangman from '@/components/game/Hangman/Hangman';
+import { Header } from '@/components/game/Header/Header';
+import { Solo } from '@/components/game/Solo/Solo';
+import { World } from '@/components/game/World/World';
+import { useLocale } from '@/i18n/i18n';
+import { pathIn } from '@/i18n/locale';
+import type { Scene } from '@/pixel/world';
 
 // The part of the village behind each screen, as in docs/prototypes/
-const SCENE_OF_PATH: Partial<Record<string, Scene>> = { "/solo": "square" };
+const SCENE_OF_PATH: Partial<Record<string, Scene>> = { '/solo': 'square' };
 
 function Layout() {
   const locale = useLocale();
   const { pathname } = useLocation();
-  const scene = SCENE_OF_PATH[pathIn("en", pathname).toLowerCase()] ?? "castle";
+  const scene = SCENE_OF_PATH[pathIn('en', pathname).toLowerCase()] ?? 'castle';
 
   useEffect(() => {
     document.documentElement.lang = locale;

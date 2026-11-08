@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { Round } from "@/components/game/Round/Round";
-import { useLocale, useStrings } from "@/i18n/i18n";
-import type { Locale } from "@/i18n/locale";
-import { markPlayed, pickWord, type SoloWord } from "@/solo";
+import { useEffect, useState } from 'react';
+import { Round } from '@/components/game/Round/Round';
+import { useLocale, useStrings } from '@/i18n/i18n';
+import type { Locale } from '@/i18n/locale';
+import { markPlayed, pickWord, type SoloWord } from '@/solo';
 
 interface SoloRoundProps {
   locale: Locale;

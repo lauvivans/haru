@@ -1,17 +1,17 @@
-import { usePeerConnection } from "@/context/PeerConnectionContext";
-import { useEffect, useState } from "react";
+import { usePeerConnection } from '@/context/PeerConnectionContext';
+import { useEffect, useState } from 'react';
 
 const useChannel = () => {
   const { dataChannel } = usePeerConnection();
   const [hits, setHits] = useState(0);
   const [misses, setMisses] = useState(0);
-  const [masterPlayer, setMasterPlayer] = useState("");
-  const [word, setWord] = useState("");
+  const [masterPlayer, setMasterPlayer] = useState('');
+  const [word, setWord] = useState('');
   const [letters, setLetters] = useState<string[]>([]);
 
   const sendToDataChannel = (id: string, data: unknown) => {
-    if (dataChannel?.readyState !== "open") {
-      console.warn("Data channel is not open");
+    if (dataChannel?.readyState !== 'open') {
+      console.warn('Data channel is not open');
       return;
     }
 
@@ -30,8 +30,8 @@ const useChannel = () => {
   };
 
   const reset = () => {
-    setMasterPlayer("");
-    setWord("");
+    setMasterPlayer('');
+    setWord('');
     setLetters([]);
     setMisses(0);
     setHits(0);
@@ -39,12 +39,12 @@ const useChannel = () => {
 
   const selectMaster = (peerId: string) => {
     setMasterPlayer(peerId);
-    sendToDataChannel("master-selection", { peerId });
+    sendToDataChannel('master-selection', { peerId });
   };
 
   const handleWord = (word: string) => {
     setWord(word);
-    sendToDataChannel("wordset", { word });
+    sendToDataChannel('wordset', { word });
   };
 
   const handleLetters = (letter: string) => {
@@ -58,7 +58,7 @@ const useChannel = () => {
       setMisses((previous) => previous + 1);
     }
 
-    sendToDataChannel("letterset", { letter });
+    sendToDataChannel('letterset', { letter });
   };
 
   useEffect(() => {
@@ -69,15 +69,15 @@ const useChannel = () => {
         const message = JSON.parse(event.data);
 
         switch (message.id) {
-          case "master-selection":
+          case 'master-selection':
             setMasterPlayer(message.data.peerId);
             break;
 
-          case "wordset":
+          case 'wordset':
             setWord(message.data.word);
             break;
 
-          case "letterset": {
+          case 'letterset': {
             const letter = message.data.letter;
 
             if (letters.includes(letter)) break;
@@ -93,25 +93,25 @@ const useChannel = () => {
             break;
           }
 
-          case "reset":
+          case 'reset':
             reset();
             break;
         }
       } catch (error) {
-        console.error("Invalid data-channel message:", error);
+        console.error('Invalid data-channel message:', error);
       }
     };
 
-    dataChannel.addEventListener("message", handleMessage);
+    dataChannel.addEventListener('message', handleMessage);
 
     return () => {
-      dataChannel.removeEventListener("message", handleMessage);
+      dataChannel.removeEventListener('message', handleMessage);
     };
   }, [dataChannel, word]);
 
   const startover = () => {
     reset();
-    sendToDataChannel("reset", {});
+    sendToDataChannel('reset', {});
   };
 
   return {

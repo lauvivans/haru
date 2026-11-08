@@ -1,9 +1,9 @@
-import "./Welcome.css";
-import { useEffect, useRef } from "react";
-import { usePeerConnection } from "@/context/PeerConnectionContext";
-import { useSocket } from "@/context/SocketContext";
-import Mascot from "@/assets/mascot.svg";
-import { useNavigate } from "react-router";
+import './Welcome.css';
+import { useEffect, useRef } from 'react';
+import { usePeerConnection } from '@/context/PeerConnectionContext';
+import { useSocket } from '@/context/SocketContext';
+import Mascot from '@/assets/mascot.svg';
+import { useNavigate } from 'react-router';
 
 const Welcome = () => {
   const { isServerAwake, peerId, connectToSignalingServer } = useSocket();
@@ -21,7 +21,7 @@ const Welcome = () => {
   useEffect(() => {
     if (dataChannel) {
       dataChannel.onopen = () => {
-        navigate("/hangman");
+        navigate('/hangman');
       };
     }
   }, [dataChannel]);
@@ -30,7 +30,7 @@ const Welcome = () => {
     <section className="welcome-section">
       <h1>Welcome to Haru</h1>
       <img src={Mascot} />
-      <p>Server is {isServerAwake ? "awake" : "down"}</p>
+      <p>Server is {isServerAwake ? 'awake' : 'down'}</p>
       <button className="btn btn--ghost" onClick={connectToSignalingServer}>
         Connect to server
       </button>

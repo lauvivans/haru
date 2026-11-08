@@ -1,36 +1,36 @@
-import "./Hangman.css";
-import { useSocket } from "@/context/SocketContext";
-import useChannel from "@/hooks/useChannel";
-import { useMemo, useRef } from "react";
-import { Gallows } from "@/components/game/Gallows/Gallows";
+import './Hangman.css';
+import { useSocket } from '@/context/SocketContext';
+import useChannel from '@/hooks/useChannel';
+import { useMemo, useRef } from 'react';
+import { Gallows } from '@/components/game/Gallows/Gallows';
 
 const ALPHABET = [
-  "A",
-  "B",
-  "C",
-  "D",
-  "E",
-  "F",
-  "G",
-  "H",
-  "I",
-  "J",
-  "K",
-  "L",
-  "M",
-  "N",
-  "O",
-  "P",
-  "Q",
-  "R",
-  "S",
-  "T",
-  "U",
-  "V",
-  "W",
-  "X",
-  "Y",
-  "Z",
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'I',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'O',
+  'P',
+  'Q',
+  'R',
+  'S',
+  'T',
+  'U',
+  'V',
+  'W',
+  'X',
+  'Y',
+  'Z',
 ];
 
 const Hangman = () => {
@@ -44,14 +44,13 @@ const Hangman = () => {
     misses,
     hits,
     selectMaster,
-    startover
+    startover,
   } = useChannel();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
   const setWord = () => {
-    if (inputRef && inputRef.current)
-      handleWord(inputRef.current.value.toUpperCase());
+    if (inputRef && inputRef.current) handleWord(inputRef.current.value.toUpperCase());
   };
 
   const handleMaster = (peerId: string) => {
@@ -59,8 +58,8 @@ const Hangman = () => {
   };
 
   const isGameFinished = useMemo(() => {
-    return (misses === 7) || (word && hits === word.length)
-  }, [misses, word, hits])
+    return misses === 7 || (word && hits === word.length);
+  }, [misses, word, hits]);
 
   return (
     <div className="hangman-section">
@@ -101,9 +100,7 @@ const Hangman = () => {
             <div className="hangman-section__word">
               {Array.from({ length: word.length }, (_, index) => (
                 <span className="hangman-section__word__letter" key={index}>
-                  {letters.includes(word[index].toUpperCase())
-                    ? word[index]
-                    : "___"}
+                  {letters.includes(word[index].toUpperCase()) ? word[index] : '___'}
                 </span>
               ))}
             </div>
@@ -123,7 +120,10 @@ const Hangman = () => {
           )}
 
           <div className="hangman-drawing">
-            <Gallows misses={misses} mood={misses === 7 ? "loss" : word && hits === word.length ? "win" : "idle"} />
+            <Gallows
+              misses={misses}
+              mood={misses === 7 ? 'loss' : word && hits === word.length ? 'win' : 'idle'}
+            />
           </div>
 
           {misses === 7 && (

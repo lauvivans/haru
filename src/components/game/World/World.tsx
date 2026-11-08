@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { mountWorld, type Scene } from "@/pixel/world";
+import { useEffect, useRef } from 'react';
+import { mountWorld, type Scene } from '@/pixel/world';
 
 // The village behind every screen. Mount it once; a new scene slides the camera.
 export function World({ scene }: { scene: Scene }) {
