@@ -6,7 +6,14 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', '.wrangler', 'worker-configuration.d.ts']),
+  globalIgnores([
+    'dist',
+    '.wrangler',
+    'worker-configuration.d.ts',
+    // TODO(#27): lint again once #27 and #31 replace this Fastify-era code.
+    'src/context',
+    'src/components/game/Welcome',
+  ]),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
