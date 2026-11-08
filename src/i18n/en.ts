@@ -22,6 +22,15 @@ export const en = {
     playAgain: "Play again",
     backHome: "Back home",
   },
+  solo: {
+    categories: {
+      animals: "Animals",
+      food: "Food",
+      countries: "Countries",
+      objects: "Objects",
+      jobs: "Jobs",
+    },
+  },
 };
 
 export type Strings = typeof en;
