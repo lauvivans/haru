@@ -10,6 +10,7 @@ import { Room } from './Room';
 vi.hoisted(() => vi.stubGlobal('matchMedia', () => ({ matches: false })));
 
 // The canvas art is checked in the browser
+vi.mock('@/pixel/gallows', () => ({ mountGallows: () => ({ update() {}, stop() {} }) }));
 vi.mock('@/pixel/haru', async (original) => ({
   ...(await original<typeof import('@/pixel/haru')>()),
   mountSprite: () => ({ update() {}, stop() {} }),
@@ -22,15 +23,24 @@ class FakeChannel {
   sent: unknown[] = [];
   onopen: (() => void) | null = null;
   onmessage: ((event: { data: string }) => void) | null = null;
+  listeners = new Set<(event: { data: string }) => void>();
   send(message: string) {
     this.sent.push(JSON.parse(message));
+  }
+  addEventListener(_type: 'message', listener: (event: { data: string }) => void) {
+    this.listeners.add(listener);
+  }
+  removeEventListener(_type: 'message', listener: (event: { data: string }) => void) {
+    this.listeners.delete(listener);
   }
   open() {
     this.readyState = 'open';
     this.onopen?.();
   }
   receive(message: unknown) {
-    this.onmessage?.({ data: JSON.stringify(message) });
+    const event = { data: JSON.stringify(message) };
+    this.onmessage?.(event);
+    this.listeners.forEach((listener) => listener(event));
   }
 }
 
@@ -137,8 +147,14 @@ describe('Room', () => {
     expect(FakePeer.last.channel.sent).toEqual([{ type: 'hello', nickname: 'Laura' }]);
 
     await fromPeer({ type: 'hello', nickname: 'Ana' });
-    expect(screen.getByRole('heading', { name: 'Playing with Ana' })).toBeTruthy();
-    expect(screen.getByText('Laura')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Pick a word for Ana' })).toBeTruthy();
+
+    await user.type(screen.getByLabelText('Word'), 'casa');
+    await user.click(screen.getByRole('button', { name: 'Start round' }));
+    expect(FakePeer.last.channel.sent.at(-1)).toEqual({ type: 'word', word: 'casa', hint: '' });
+    await fromPeer({ type: 'guess', letter: 'A' });
+    expect(screen.getByText('Ana is guessing your word…')).toBeTruthy();
+    expect(screen.getAllByRole('button', { name: 'A' })[0].hasAttribute('disabled')).toBe(true);
   });
 
   it('goes back to the invite when the friend leaves, and connects again when they return', async () => {
@@ -148,7 +164,8 @@ describe('Room', () => {
     await fromServer({ type: 'peer-joined' });
     await openChannel();
     await fromPeer({ type: 'hello', nickname: 'Ana' });
-    expect(screen.getByRole('heading', { name: 'Playing with Ana' })).toBeTruthy();
+    // Joined by link, but was in the room first, so picks first
+    expect(screen.getByRole('heading', { name: 'Pick a word for Ana' })).toBeTruthy();
 
     await fromServer({ type: 'peer-disconnected' });
     expect(screen.getByRole('heading', { name: 'Invite a friend' })).toBeTruthy();
@@ -190,8 +207,10 @@ describe('Room', () => {
     await user.click(screen.getByRole('button', { name: 'Join room' }));
 
     expect(FakePeer.last.channel.sent).toEqual([{ type: 'hello', nickname: 'Ana' }]);
-    expect(screen.getByRole('heading', { name: 'Playing with Laura' })).toBeTruthy();
-    expect(screen.getByText('Ana')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Laura is picking a word…' })).toBeTruthy();
+
+    await fromPeer({ type: 'word', word: 'pé', hint: '' });
+    expect(screen.getByText('Laura picked the word. Save Haru!')).toBeTruthy();
   });
 
   it('drops a peer message that is not a valid hello', async () => {

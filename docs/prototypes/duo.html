@@ -16,6 +16,7 @@
     <nav class="proto-states" aria-label="Prototype states">
       <span>Prototype states:</span>
       <button class="btn btn--ghost btn--small" data-show="pick">Laura picks</button>
+      <button class="btn btn--ghost btn--small" data-show="wait">Ana waits</button>
       <button class="btn btn--ghost btn--small" data-show="guess">Ana guesses</button>
       <button class="btn btn--ghost btn--small" data-show="watch">Laura watches</button>
       <button class="btn btn--ghost btn--small" data-show="end">End of round</button>
@@ -36,10 +37,12 @@
         <div class="field">
           <label for="secret"><span lang="en">Word</span><span lang="pt-BR">Palavra</span></label>
           <div class="input-row">
-            <input class="input" id="secret" type="password" maxlength="24" value="GUARDA-CHUVA" autocomplete="off">
+            <input class="input" id="secret" type="password" value="GUARDA-CHUVA" autocomplete="off">
             <button class="btn btn--ghost" id="reveal" aria-pressed="false"><span lang="en">Show</span><span lang="pt-BR">Mostrar</span></button>
           </div>
-          <span class="field__hint"><span lang="en">2 to 24 characters: letters, spaces and hyphens. Accents are fine.</span><span lang="pt-BR">De 2 a 24 caracteres: letras, espaços e hífens. Pode ter acento.</span></span>
+          <span class="field__hint" id="secret-rule"><span lang="en">2 to 24 characters: letters, spaces and hyphens. Accents are fine.</span><span lang="pt-BR">De 2 a 24 caracteres: letras, espaços e hífens. Pode ter acento.</span></span>
+          <!-- Shown instead of the rule when the word is refused; type a digit to see it -->
+          <span class="field__error" id="secret-refused" role="alert" hidden><span lang="en">Use 2 to 24 characters, only letters, spaces and hyphens.</span><span lang="pt-BR">Use de 2 a 24 caracteres, só letras, espaços e hífens.</span></span>
         </div>
         <div class="field">
           <label for="tip"><span lang="en">Hint (optional)</span><span lang="pt-BR">Dica (opcional)</span></label>
@@ -47,6 +50,13 @@
           <span class="field__hint"><span lang="en">Up to 40 characters.</span><span lang="pt-BR">Até 40 caracteres.</span></span>
         </div>
         <button class="btn btn--primary btn--block" data-go="watch"><span lang="en">Start round</span><span lang="pt-BR">Começar rodada</span></button>
+      </section>
+
+      <!-- The guesser waits while the picker types the word -->
+      <section class="panel narrow stack center" data-state="wait">
+        <canvas class="sprite" data-size="md" data-mood="idle"></canvas>
+        <h1><span lang="en">Laura is picking a word…</span><span lang="pt-BR">Laura está escolhendo uma palavra…</span></h1>
+        <p class="muted"><span lang="en">The round starts when the word is ready.</span><span lang="pt-BR">A rodada começa quando a palavra estiver pronta.</span></p>
       </section>
 
       <!-- The guesser plays; this one is playable -->
@@ -116,6 +126,13 @@
 
     // Re-run the current state now that the listener exists
     document.querySelector('[data-show][aria-pressed="true"]').click();
+
+    document.getElementById("secret").addEventListener("input", (e) => {
+      const word = e.currentTarget.value.trim();
+      const ok = word.length >= 2 && word.length <= 24 && /^[\p{L} -]+$/u.test(word);
+      document.getElementById("secret-rule").hidden = !ok;
+      document.getElementById("secret-refused").hidden = ok;
+    });
 
     document.getElementById("reveal").addEventListener("click", (e) => {
       const input = document.getElementById("secret");

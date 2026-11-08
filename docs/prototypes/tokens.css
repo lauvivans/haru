@@ -22,6 +22,7 @@
   --ink-brown-soft: #6e4c33;
   --crimson: #b33a3a;
   --crimson-dark: #7a2222;
+  --crimson-soft: #e8796f;
   --gold: #e8b23a;
   --gold-dark: #9a6a12;
   --moss: #4f8a3a;
@@ -49,6 +50,7 @@
   --hit-dark: var(--moss-dark);
   --miss: var(--crimson);
   --miss-dark: var(--crimson-dark);
+  --error: var(--crimson);
   --key: var(--parchment);
   --key-shade: var(--parchment-shade);
   --focus: var(--gold);
@@ -192,6 +194,7 @@
     --text-on-accent: var(--ink-brown);
     --key: var(--stone-edge);
     --key-shade: var(--stone-panel-shade);
+    --error: var(--crimson-soft);
 
     --px-sky-top: #141433;
     --px-sky-mid: #23234f;
@@ -242,6 +245,7 @@
   --text-on-accent: var(--ink-brown);
   --key: var(--stone-edge);
   --key-shade: var(--stone-panel-shade);
+  --error: var(--crimson-soft);
 
   --px-sky-top: #141433;
   --px-sky-mid: #23234f;

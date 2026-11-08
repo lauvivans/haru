@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type { Move } from '@/duo';
 import { parsePeerMessage, parseServerMessage, type ServerMessage } from '@/room';
 
 // TURN for strict networks comes with #23 (decision 001)
@@ -9,9 +10,33 @@ function roomUrl(code: string) {
   return `${protocol}//${location.host}/rooms/${code.toUpperCase()}`;
 }
 
+// Game moves to and from the other player, over the data channel
+export interface PeerLink {
+  send: (move: Move) => void;
+  listen: (onMove: (move: Move) => void) => () => void;
+}
+
 export interface RoomState {
   full: boolean;
   peerName: string | null; // the other player, once they said their nickname
+  first: boolean; // this player was in the room before the other joined
+  link: PeerLink | null;
+}
+
+function linkOf(channel: RTCDataChannel): PeerLink {
+  return {
+    send(move) {
+      if (channel.readyState === 'open') channel.send(JSON.stringify(move));
+    },
+    listen(onMove) {
+      const onMessage = (event: MessageEvent) => {
+        const message = parsePeerMessage(event.data);
+        if (message && message.type !== 'hello') onMove(message);
+      };
+      channel.addEventListener('message', onMessage);
+      return () => channel.removeEventListener('message', onMessage);
+    },
+  };
 }
 
 // Joins the room's signaling socket and connects to the other player over WebRTC.
@@ -20,6 +45,7 @@ export interface RoomState {
 export function useRoom(code: string, name: string | null): RoomState {
   const [full, setFull] = useState(false);
   const [peerName, setPeerName] = useState<string | null>(null);
+  const [first, setFirst] = useState(false);
   const [channel, setChannel] = useState<RTCDataChannel | null>(null);
 
   useEffect(() => {
@@ -60,12 +86,14 @@ export function useRoom(code: string, name: string | null): RoomState {
           setFull(true);
           break;
         case 'peer-joined': {
+          setFirst(true);
           const connection = connect();
           await connection.setLocalDescription();
           signal('offer', connection.localDescription);
           break;
         }
         case 'offer': {
+          setFirst(false);
           const connection = connect();
           await connection.setRemoteDescription(message.data);
           await connection.setLocalDescription();
@@ -104,5 +132,6 @@ export function useRoom(code: string, name: string | null): RoomState {
     }
   }, [channel, name]);
 
-  return { full, peerName };
+  const link = useMemo(() => channel && linkOf(channel), [channel]);
+  return { full, peerName, first, link };
 }

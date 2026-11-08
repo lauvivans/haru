@@ -1,3 +1,5 @@
+import { isHint, isWord, type Move } from '@/duo';
+import { ALPHABET } from '@/round';
 import { stored } from '@/stored';
 
 // Same alphabet and length as the codes the Worker hands out (worker/index.ts)
@@ -20,7 +22,7 @@ export type ServerMessage =
   | { type: 'offer' | 'answer'; data: RTCSessionDescriptionInit }
   | { type: 'ice-candidate'; data: RTCIceCandidateInit };
 
-export type PeerMessage = { type: 'hello'; nickname: string };
+export type PeerMessage = { type: 'hello'; nickname: string } | Move;
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -65,8 +67,17 @@ export function parseServerMessage(message: unknown): ServerMessage | null {
 // Messages from the other player are untrusted too
 export function parsePeerMessage(message: unknown): PeerMessage | null {
   const value = parseJson(message);
-  if (value?.type === 'hello' && typeof value.nickname === 'string' && isNickname(value.nickname)) {
-    return { type: 'hello', nickname: value.nickname };
+  if (!value) return null;
+  const { type, nickname: name, word, hint, letter } = value;
+
+  if (type === 'hello' && typeof name === 'string' && isNickname(name)) {
+    return { type, nickname: name };
+  }
+  if (type === 'word' && typeof word === 'string' && typeof hint === 'string') {
+    return isWord(word) && isHint(hint) ? { type, word, hint } : null;
+  }
+  if (type === 'guess' && typeof letter === 'string' && ALPHABET.includes(letter)) {
+    return { type, letter };
   }
   return null;
 }
