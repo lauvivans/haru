@@ -6,13 +6,6 @@ Hangman game in the browser. Two players connect peer to peer with WebRTC (one p
 
 Everything in the repository and on GitHub is in English: code, docs, file names, issues, PRs, commits and reviews. The game UI offers English and Portuguese (`/pt-BR/`).
 
-## Docs
-
-- `docs/engineering-guidelines.md`: rules for writing and reviewing code (structure, styles, tests, security, PR review).
-- `docs/decisions/`: one decision per file, numbered. Every spike ends with a file here.
-- `docs/product/requirements.md`: what the game does and its rules.
-- `docs/prototypes/`: HTML prototype, the visual reference for screens, tokens and the character.
-
 ## Engineering guidelines
 
 Follow the guidelines below when implementing and when reviewing PRs. They are imported from `docs/engineering-guidelines.md`, so edit them there.
