@@ -1,11 +1,8 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { useSocket } from "./SocketContext";
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { useSocket } from './SocketContext';
 
 interface PeerConnectionContextProps {
-  createPeerConnection: (
-    targetPeerId: string,
-    initiator: boolean,
-  ) => Promise<RTCPeerConnection>;
+  createPeerConnection: (targetPeerId: string, initiator: boolean) => Promise<RTCPeerConnection>;
   peerConnection: RTCPeerConnection | null;
   dataChannel: RTCDataChannel | null;
 }
@@ -14,30 +11,22 @@ const PeerConnectionContext = createContext<PeerConnectionContextProps>(
   {} as PeerConnectionContextProps,
 );
 
-const ICE_SERVERS_URLS = ["stun:stun.l.google.com:19302"];
+const ICE_SERVERS_URLS = ['stun:stun.l.google.com:19302'];
 
-const PeerConnectionProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+const PeerConnectionProvider = ({ children }: { children: React.ReactNode }) => {
   const { socket, handlePeerId, handlePeerIdExt } = useSocket();
-  const [peerConnection, setPeerConnection] =
-    useState<RTCPeerConnection | null>(null);
+  const [peerConnection, setPeerConnection] = useState<RTCPeerConnection | null>(null);
   const [dataChannel, setDataChannel] = useState<RTCDataChannel | null>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const pendingCandidatesRef = useRef<RTCIceCandidateInit[]>([]);
 
   const handleDataChannel = (dc: RTCDataChannel) => {
-    dc.onclose = () => console.log("Data Channel closed");
-    dc.onerror = (error) => console.error("Data Channel error", error);
+    dc.onclose = () => console.log('Data Channel closed');
+    dc.onerror = (error) => console.error('Data Channel error', error);
     setDataChannel(dc);
   };
 
-  const createPeerConnection = async (
-    targetPeerId: string,
-    initiator = false,
-  ) => {
+  const createPeerConnection = async (targetPeerId: string, initiator = false) => {
     const pc = new RTCPeerConnection({
       iceServers: [{ urls: ICE_SERVERS_URLS }],
     });
@@ -47,14 +36,10 @@ const PeerConnectionProvider = ({
     handlePeerIdExt(targetPeerId);
 
     pc.onicecandidate = (event) => {
-      if (
-        event.candidate &&
-        socket?.readyState === WebSocket.OPEN &&
-        targetPeerId
-      ) {
+      if (event.candidate && socket?.readyState === WebSocket.OPEN && targetPeerId) {
         socket.send(
           JSON.stringify({
-            type: "ice-candidate",
+            type: 'ice-candidate',
             targetPeerId,
             data: event.candidate,
           }),
@@ -63,11 +48,11 @@ const PeerConnectionProvider = ({
     };
 
     pc.onconnectionstatechange = () => {
-      console.log("Peer connection:", pc.connectionState);
+      console.log('Peer connection:', pc.connectionState);
     };
 
     if (initiator) {
-      handleDataChannel(pc.createDataChannel("messages"));
+      handleDataChannel(pc.createDataChannel('messages'));
       await createAndSendOffer(pc, targetPeerId);
     } else {
       pc.ondatachannel = (event) => handleDataChannel(event.channel);
@@ -76,17 +61,14 @@ const PeerConnectionProvider = ({
     return pc;
   };
 
-  const createAndSendOffer = async (
-    pc: RTCPeerConnection,
-    targetPeerId: string,
-  ) => {
+  const createAndSendOffer = async (pc: RTCPeerConnection, targetPeerId: string) => {
     if (socket?.readyState !== WebSocket.OPEN || !targetPeerId) {
-      throw new Error("Signaling socket is not open or target peer is empty");
+      throw new Error('Signaling socket is not open or target peer is empty');
     }
 
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
-    socket.send(JSON.stringify({ type: "offer", targetPeerId, data: offer }));
+    socket.send(JSON.stringify({ type: 'offer', targetPeerId, data: offer }));
   };
 
   useEffect(() => {
@@ -97,11 +79,11 @@ const PeerConnectionProvider = ({
 
       try {
         switch (data.type) {
-          case "register":
+          case 'register':
             handlePeerId(data.peerId);
             break;
 
-          case "offer": {
+          case 'offer': {
             const targetPeerId = data.fromPeerId;
             const pc = await createPeerConnection(targetPeerId, false);
 
@@ -116,7 +98,7 @@ const PeerConnectionProvider = ({
             await pc.setLocalDescription(answer);
             socket.send(
               JSON.stringify({
-                type: "answer",
+                type: 'answer',
                 targetPeerId,
                 data: answer,
               }),
@@ -124,12 +106,10 @@ const PeerConnectionProvider = ({
             break;
           }
 
-          case "answer": {
+          case 'answer': {
             const pc = peerConnectionRef.current;
             if (pc) {
-              await pc.setRemoteDescription(
-                new RTCSessionDescription(data.data),
-              );
+              await pc.setRemoteDescription(new RTCSessionDescription(data.data));
               for (const candidate of pendingCandidatesRef.current) {
                 await pc.addIceCandidate(candidate);
               }
@@ -138,7 +118,7 @@ const PeerConnectionProvider = ({
             break;
           }
 
-          case "ice-candidate": {
+          case 'ice-candidate': {
             const candidate = new RTCIceCandidate(data.data);
             const pc = peerConnectionRef.current;
 
@@ -150,8 +130,8 @@ const PeerConnectionProvider = ({
             break;
           }
 
-          case "error":
-            console.error("Signaling server error:", data.message);
+          case 'error':
+            console.error('Signaling server error:', data.message);
             break;
         }
       } catch (error) {
@@ -165,9 +145,7 @@ const PeerConnectionProvider = ({
   }, [socket]);
 
   return (
-    <PeerConnectionContext.Provider
-      value={{ createPeerConnection, peerConnection, dataChannel }}
-    >
+    <PeerConnectionContext.Provider value={{ createPeerConnection, peerConnection, dataChannel }}>
       {children}
     </PeerConnectionContext.Provider>
   );

@@ -14,12 +14,15 @@ concurrency:
 
 jobs:
   ci:
-    name: Type check, lint, tests and build
+    name: Type check, lint, format, tests and build
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          # Full history, so the format check can diff against the base branch.
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
@@ -40,6 +43,20 @@ jobs:
       - name: Lint
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run lint
+
+      # Only the files the PR changes are checked. Files in .prettierignore
+      # are skipped.
+      - name: Check formatting of changed files
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        env:
+          BASE: ${{ github.base_ref }}
+        run: |
+          files=$(git diff --name-only --diff-filter=ACMR "origin/$BASE...HEAD")
+          if [ -z "$files" ]; then
+            echo "No changed files to check."
+            exit 0
+          fi
+          echo "$files" | xargs -d '\n' npx prettier --check --ignore-unknown
 
       - name: Run tests
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}

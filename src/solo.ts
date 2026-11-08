@@ -1,5 +1,5 @@
-import type { Locale } from "@/i18n/locale";
-import { CATEGORIES, wordLists, type Category } from "@/words/words";
+import type { Locale } from '@/i18n/locale';
+import { CATEGORIES, wordLists, type Category } from '@/words/words';
 
 export interface SoloWord {
   word: string;
@@ -17,10 +17,10 @@ const keyOf = (locale: Locale) => `haru-played-${locale}`;
 // blocked (private mode), so anything that isn't a word of the list is dropped.
 export function playedIn(locale: Locale): string[] {
   try {
-    const saved: unknown = JSON.parse(localStorage.getItem(keyOf(locale)) ?? "[]");
+    const saved: unknown = JSON.parse(localStorage.getItem(keyOf(locale)) ?? '[]');
     if (!Array.isArray(saved)) return [];
     const words = new Set(wordsIn(locale).map((w) => w.word));
-    return [...new Set(saved.filter((w): w is string => typeof w === "string" && words.has(w)))];
+    return [...new Set(saved.filter((w): w is string => typeof w === 'string' && words.has(w)))];
   } catch {
     return [];
   }
@@ -40,7 +40,10 @@ export function markPlayed(locale: Locale, word: string) {
   if (played.includes(word)) return;
   const next = [...played, word];
   try {
-    localStorage.setItem(keyOf(locale), JSON.stringify(next.length >= wordsIn(locale).length ? [word] : next));
+    localStorage.setItem(
+      keyOf(locale),
+      JSON.stringify(next.length >= wordsIn(locale).length ? [word] : next),
+    );
   } catch {
     /* storage blocked */
   }

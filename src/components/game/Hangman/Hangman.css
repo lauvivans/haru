@@ -39,7 +39,7 @@
   cursor: pointer;
 }
 
-.welcome-section__master__cards__card[data-is-active="true"] {
+.welcome-section__master__cards__card[data-is-active='true'] {
   background-color: var(--accent-bg);
 }
 

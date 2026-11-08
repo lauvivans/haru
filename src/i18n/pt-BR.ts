@@ -1,34 +1,34 @@
-import type { Strings } from "./en";
+import type { Strings } from './en';
 
 export const ptBR: Strings = {
   langSwitch: {
-    label: "Idioma",
+    label: 'Idioma',
   },
   themeSwitch: {
-    label: "Dia ou noite",
-    light: "Dia",
-    dark: "Noite",
+    label: 'Dia ou noite',
+    light: 'Dia',
+    dark: 'Noite',
   },
   lookPicker: {
-    label: "Visual do Haru",
-    villager: "Aldeão",
-    wizard: "Mago",
-    knight: "Cavaleiro",
+    label: 'Visual do Haru',
+    villager: 'Aldeão',
+    wizard: 'Mago',
+    knight: 'Cavaleiro',
   },
   round: {
-    won: "O Haru está livre!",
-    lost: "Não deu para salvar o Haru",
-    wordWas: "A palavra era",
-    playAgain: "Jogar de novo",
-    backHome: "Voltar ao início",
+    won: 'O Haru está livre!',
+    lost: 'Não deu para salvar o Haru',
+    wordWas: 'A palavra era',
+    playAgain: 'Jogar de novo',
+    backHome: 'Voltar ao início',
   },
   solo: {
     categories: {
-      animals: "Animais",
-      food: "Comida",
-      countries: "Países",
-      objects: "Objetos",
-      jobs: "Profissões",
+      animals: 'Animais',
+      food: 'Comida',
+      countries: 'Países',
+      objects: 'Objetos',
+      jobs: 'Profissões',
     },
   },
 };

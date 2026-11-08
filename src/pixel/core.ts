@@ -1,18 +1,18 @@
 // Shared pieces of the pixel art: the palette, the pen, motion and the frame loop.
 // Everything is painted with rectangles on small canvases and scaled up with
 // image-rendering: pixelated. Colors come from the --px-* tokens; GSAP runs the motion.
-import { gsap } from "gsap";
-import { theme } from "@/theme";
+import { gsap } from 'gsap';
+import { theme } from '@/theme';
 
-export const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+export const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const NAMES = (
-  "sky-top sky-mid sky-low sky-light cloud cloud-shade star mountain mountain-shade hill hill-shade " +
-  "stone stone-shade stone-dark roof roof-shade roof-blue flag flag-alt wood wood-light wood-dark wall window " +
-  "window-lit tree tree-shade ground ground-shade cobble water water-light flame flame-light awning awning-alt " +
-  "outline skin hair hair-light tunic tunic-shade belt pants boots eye cheek sweat sparkle rope rope-shade " +
-  "gold robe robe-shade steel steel-shade tabard tabard-shade plume"
-).split(" ");
+  'sky-top sky-mid sky-low sky-light cloud cloud-shade star mountain mountain-shade hill hill-shade ' +
+  'stone stone-shade stone-dark roof roof-shade roof-blue flag flag-alt wood wood-light wood-dark wall window ' +
+  'window-lit tree tree-shade ground ground-shade cobble water water-light flame flame-light awning awning-alt ' +
+  'outline skin hair hair-light tunic tunic-shade belt pants boots eye cheek sweat sparkle rope rope-shade ' +
+  'gold robe robe-shade steel steel-shade tabard tabard-shade plume'
+).split(' ');
 
 // Palette, read from the tokens on load and on every theme switch
 export const P: Record<string, string> = {};
@@ -24,8 +24,8 @@ export function token(name: string) {
 
 function readPalette() {
   const s = getComputedStyle(document.documentElement);
-  NAMES.forEach((n) => (P[n] = s.getPropertyValue("--px-" + n).trim()));
-  view.night = theme.get() === "dark";
+  NAMES.forEach((n) => (P[n] = s.getPropertyValue('--px-' + n).trim()));
+  view.night = theme.get() === 'dark';
 }
 readPalette();
 theme.subscribe(readPalette);
@@ -35,7 +35,9 @@ type Vars = gsap.TweenVars;
 export function to(target: object, vars: Vars) {
   if (!reduced) return gsap.to(target, vars);
   const values: Record<string, unknown> = { ...vars };
-  ["duration", "ease", "delay", "repeat", "yoyo", "onComplete", "keyframes", "overwrite"].forEach((k) => delete values[k]);
+  ['duration', 'ease', 'delay', 'repeat', 'yoyo', 'onComplete', 'keyframes', 'overwrite'].forEach(
+    (k) => delete values[k],
+  );
   Object.assign(target, values);
   vars.onComplete?.();
   return null;

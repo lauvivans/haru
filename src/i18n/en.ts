@@ -2,33 +2,33 @@
 // pt-BR.ts has the same shape, so a missing translation fails the type check.
 export const en = {
   langSwitch: {
-    label: "Language",
+    label: 'Language',
   },
   themeSwitch: {
-    label: "Day or night",
-    light: "Day",
-    dark: "Night",
+    label: 'Day or night',
+    light: 'Day',
+    dark: 'Night',
   },
   lookPicker: {
     label: "Haru's look",
-    villager: "Villager",
-    wizard: "Wizard",
-    knight: "Knight",
+    villager: 'Villager',
+    wizard: 'Wizard',
+    knight: 'Knight',
   },
   round: {
-    won: "Haru is free!",
+    won: 'Haru is free!',
     lost: "Haru didn't make it",
-    wordWas: "The word was",
-    playAgain: "Play again",
-    backHome: "Back home",
+    wordWas: 'The word was',
+    playAgain: 'Play again',
+    backHome: 'Back home',
   },
   solo: {
     categories: {
-      animals: "Animals",
-      food: "Food",
-      countries: "Countries",
-      objects: "Objects",
-      jobs: "Jobs",
+      animals: 'Animals',
+      food: 'Food',
+      countries: 'Countries',
+      objects: 'Objects',
+      jobs: 'Jobs',
     },
   },
 };

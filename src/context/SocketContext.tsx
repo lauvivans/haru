@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from 'react';
 
 interface SocketContextProps {
   peerId: string;
@@ -10,16 +10,14 @@ interface SocketContextProps {
   handlePeerIdExt: (peerId: string) => void;
 }
 
-const SocketContext = createContext<SocketContextProps>(
-  {} as SocketContextProps,
-);
+const SocketContext = createContext<SocketContextProps>({} as SocketContextProps);
 
 const SIGNALING_SERVER = import.meta.env.VITE_SERVER_URL;
 
 const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [peerId, setPeerId] = useState("");
-  const [peerIdExt, setPeerIdExt] = useState("");
+  const [peerId, setPeerId] = useState('');
+  const [peerIdExt, setPeerIdExt] = useState('');
   const [isServerAwake, setIsServerAwake] = useState(false);
 
   const handlePeerId = (peerId: string) => setPeerId(peerId);
