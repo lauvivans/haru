@@ -22,4 +22,13 @@ export const ptBR: Strings = {
     playAgain: "Jogar de novo",
     backHome: "Voltar ao início",
   },
+  solo: {
+    categories: {
+      animals: "Animais",
+      food: "Comida",
+      countries: "Países",
+      objects: "Objetos",
+      jobs: "Profissões",
+    },
+  },
 };
