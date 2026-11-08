@@ -4,8 +4,7 @@
 import { gsap } from "gsap";
 import { to, token, pen, onFrame } from "@/pixel/core";
 import { drawHaru, newState, react, type Mood, type SpriteSize } from "@/pixel/haru";
-
-export const MAX_MISSES = 7;
+import { MAX_MISSES } from "@/round";
 
 const STAGE_W = 112, STAGE_H = 104;
 const HARU_X = 58;

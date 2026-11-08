@@ -15,4 +15,11 @@ export const ptBR: Strings = {
     wizard: "Mago",
     knight: "Cavaleiro",
   },
+  round: {
+    won: "O Haru está livre!",
+    lost: "Não deu para salvar o Haru",
+    wordWas: "A palavra era",
+    playAgain: "Jogar de novo",
+    backHome: "Voltar ao início",
+  },
 };
