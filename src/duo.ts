@@ -12,6 +12,11 @@ export interface DuoRound {
   guesses: string[];
 }
 
+export interface Score {
+  me: number;
+  peer: number;
+}
+
 export type Move = { type: 'word'; word: string; hint: string } | { type: 'guess'; letter: string };
 
 export function tidyWord(value: string) {
@@ -68,8 +73,8 @@ export function play(rounds: DuoRound[], move: Move, byMe: boolean, first: boole
 }
 
 // The guesser wins the round by saving Haru, the picker when Haru isn't saved
-export function scoreOf(rounds: DuoRound[], first: boolean) {
-  const score = { me: 0, peer: 0 };
+export function scoreOf(rounds: DuoRound[], first: boolean, past: Score = { me: 0, peer: 0 }) {
+  const score = { ...past };
   rounds.forEach((round, index) => {
     const status = statusOf(round);
     if (status === 'playing') return;
@@ -78,4 +83,41 @@ export function scoreOf(rounds: DuoRound[], first: boolean) {
     else score.peer++;
   });
   return score;
+}
+
+// Far more rounds than one session plays; a bigger number didn't come from the game
+const MAX_POINTS = 10_000;
+const scoreKey = (code: string) => `haru-score-${code.toUpperCase()}`;
+
+function isPoints(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= MAX_POINTS;
+}
+
+// The room's score is kept in this browser, so it survives a player leaving and coming
+// back with the same link. Storage is untrusted and can be blocked: a bad value is 0 × 0.
+export function savedScore(code: string): Score {
+  try {
+    const saved: unknown = JSON.parse(localStorage.getItem(scoreKey(code)) ?? 'null');
+    if (
+      typeof saved === 'object' &&
+      saved !== null &&
+      'me' in saved &&
+      'peer' in saved &&
+      isPoints(saved.me) &&
+      isPoints(saved.peer)
+    ) {
+      return { me: saved.me, peer: saved.peer };
+    }
+  } catch {
+    /* storage blocked or not JSON */
+  }
+  return { me: 0, peer: 0 };
+}
+
+export function saveScore(code: string, score: Score) {
+  try {
+    localStorage.setItem(scoreKey(code), JSON.stringify({ me: score.me, peer: score.peer }));
+  } catch {
+    /* storage blocked */
+  }
 }

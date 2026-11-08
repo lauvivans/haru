@@ -71,6 +71,14 @@ export const ptBR: Strings = {
       create: 'Criar uma sala',
       solo: 'Jogar sozinho',
     },
+    left: {
+      title: (name: string) => `${name} saiu da sala`,
+      intro: (name: string) =>
+        `A conexão caiu. Você pode esperar ${name} voltar pelo mesmo link ou voltar ao início.`,
+      score: 'Placar',
+      wait: 'Esperar na sala',
+      home: 'Voltar ao início',
+    },
   },
   duo: {
     picks: 'escolhe',

@@ -27,6 +27,7 @@ class FakeLink implements PeerLink {
   }
 }
 
+const CODE = 'K7QXAB';
 let link: FakeLink;
 
 function setup(creator: boolean) {
@@ -34,7 +35,7 @@ function setup(creator: boolean) {
   const [name, peerName] = creator ? ['Laura', 'Ana'] : ['Ana', 'Laura'];
   render(
     <MemoryRouter>
-      <Duo link={link} first={creator} name={name} peerName={peerName} />
+      <Duo code={CODE} link={link} first={creator} name={name} peerName={peerName} />
     </MemoryRouter>,
   );
   return user;
@@ -68,6 +69,7 @@ describe('Duo', () => {
 
   afterEach(() => {
     cleanup();
+    localStorage.clear();
     vi.useRealTimers();
     vi.restoreAllMocks();
   });
@@ -165,6 +167,19 @@ describe('Duo', () => {
     expect(screen.getByRole('heading', { name: "Haru didn't make it" })).toBeTruthy();
     expect(screen.getByText('Next round: Ana picks the word.')).toBeTruthy();
     expect(points()).toBe('1 × 0');
+  });
+
+  it('keeps counting from the score saved for the room', async () => {
+    localStorage.setItem('haru-score-K7QXAB', JSON.stringify({ me: 2, peer: 1 }));
+    const user = setup(false);
+    expect(points()).toBe('2 × 1');
+
+    link.receive({ type: 'word', word: 'pé', hint: '' });
+    await user.click(key('P'));
+    await user.click(key('E'));
+
+    expect(points()).toBe('3 × 1');
+    expect(JSON.parse(localStorage.getItem('haru-score-K7QXAB') ?? '')).toEqual({ me: 3, peer: 1 });
   });
 
   it('starts the next round when the word arrives before the end dialog is left', async () => {
