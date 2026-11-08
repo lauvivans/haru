@@ -12,6 +12,7 @@ Haru is only a game. Keep the code, the design system and the character small an
 - A new dependency needs a justification in the PR and a supply chain check (new packages in the lockfile, install scripts, `npm audit signatures`, publish dates, `npm audit`), reported in the review.
 - Readable beats clever. Names describe what the thing is.
 - Code is formatted with Prettier (`npm run format`). Review doesn't comment on spacing or quotes; CI checks the files a PR changes.
+- A pre-commit hook (Husky and lint-staged, set up by `npm install`) runs `eslint --fix` and `prettier --write` on the staged files. It can be skipped with `--no-verify`, so CI stays the check that counts.
 
 ## Scope of a PR
 
