@@ -6,27 +6,17 @@ Hangman game in the browser. Two players connect peer to peer with WebRTC (one p
 
 Everything in the repository and on GitHub is in English: code, docs, file names, issues, PRs, commits and reviews. The game UI offers English and Portuguese (`/pt-BR/`).
 
-## Structure
+## Engineering guidelines
 
-One Cloudflare Worker project at the repo root.
+Follow the guidelines below when implementing and when reviewing PRs. They are imported from `docs/engineering-guidelines.md`, so edit them there.
 
-- `src/`: the React app (Vite SPA), served by the Worker as static assets.
-  - `src/components/ui/`: generic components that know nothing about the game (button, panel, field). `src/components/game/`: every other component. One folder per component.
-  - `src/styles/`: tokens and base styles, copied from the prototype. `src/pixel/`: the pixel art (village, Haru, gallows).
-- `worker/`: the Worker entry and the `Room` Durable Object, one per room, for signaling. It only helps two peers find each other; game moves go over the WebRTC data channel.
-- `wrangler.jsonc`: Worker config (assets, Durable Object binding `ROOMS`). `npm run cf-typegen` generates `worker-configuration.d.ts`, which is not committed.
-- `npm run dev` runs the client and the Worker together through the Cloudflare Vite plugin. Node version is in `.nvmrc`.
-- `docs/decisions/`: one decision per file, numbered. Every spike ends with a file here.
-- `docs/product/requirements.md`: what the game does and its rules.
-- `docs/prototypes/`: HTML prototype, the visual reference for screens, tokens and the character.
+@docs/engineering-guidelines.md
 
-## Visual changes
+## Commands
 
-Change the prototype first, validate it, then implement it in the app. Haru is only a game, so the design system and the character stay small and simple.
-
-## Stack and hosting
-
-Decision 001: client and signaling on one Cloudflare Worker, one Durable Object per room, STUN plus Cloudflare TURN. The goal is to spend as close to zero as possible.
+- `npm run dev`: client and Worker together through the Cloudflare Vite plugin. Node version is in `.nvmrc`.
+- `npm run lint`, `npm run typecheck`, `npm run build`.
+- `npm run cf-typegen`: generates `worker-configuration.d.ts` (not committed).
 
 ## Workflow
 
@@ -48,7 +38,3 @@ Decision 001: client and signaling on one Cloudflare Worker, one Durable Object 
   - When the PR is merged into `develop`, move it to **In staging**.
   - If QA on staging fails, move it back to **In progress** and fix it in a new PR on the same issue.
   - The release to `main` closes the issue and moves it to **Done**. A problem found after that is a new bug issue that links the original.
-
-## Security
-
-The repo is public. Never commit `.env` values, keys, tokens, hostnames or IPs of servers, or cloud account IDs.
