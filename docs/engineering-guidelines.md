@@ -144,7 +144,7 @@ How:
 - Mock only the edges: WebRTC, the signaling socket, `localStorage`, `matchMedia`, the canvas. Don't mock child components, contexts or internal helpers.
 - Reset mocks between tests (`vi.restoreAllMocks()` in `afterEach`).
 - One top-level `describe` naming what is under test. Nested `describe` blocks only to separate contexts.
-- Before opening the PR, `npm run typecheck`, the tests and `npm run build` pass, and lint passes on the files the PR touches (`npx eslint <files>`). The whole repo has to pass `npm run lint` once the code left from the Fastify version (`src/context/`, `src/hooks/useChannel.ts`, the old `Welcome` and `Hangman` screens) is replaced.
+- Before opening the PR, `npm run typecheck`, `npm run lint`, the tests and `npm run build` pass. CI runs the same checks on every PR. The code left from the Fastify version that still fails lint (`src/context/`, the old `Welcome` screen) is in the ESLint ignores until it is replaced.
 
 ## Reviewing a PR
 

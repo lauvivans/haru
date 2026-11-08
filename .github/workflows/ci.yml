@@ -20,9 +20,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-        with:
-          # Full history, so the lint step can diff against the base branch.
-          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
@@ -40,20 +37,9 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run typecheck
 
-      # Only the files the PR changes, as the engineering guidelines ask, while
-      # the Fastify-era code still fails lint.
-      # TODO(#27): switch to `npm run lint` once #27 and #31 replace that code.
-      - name: Lint changed files
+      - name: Lint
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
-        env:
-          BASE: ${{ github.base_ref }}
-        run: |
-          files=$(git diff --name-only --diff-filter=ACMR "origin/$BASE...HEAD" | grep -E '\.(ts|tsx|js)$' || true)
-          if [ -z "$files" ]; then
-            echo "No changed files to lint."
-            exit 0
-          fi
-          echo "$files" | xargs -d '\n' npx eslint
+        run: npm run lint
 
       - name: Run tests
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
