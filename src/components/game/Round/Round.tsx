@@ -91,7 +91,7 @@ export function Round({ word, hint, guesses, canGuess = true, onGuess, onPlayAga
               </span>
             ))}
           </div>
-          <p className="misses" aria-label={t.misses(misses, MAX_MISSES)}>
+          <p className="misses">
             {misses} / {MAX_MISSES}
           </p>
           <Keyboard used={used} locked={!canGuess || over} onPick={pick} />

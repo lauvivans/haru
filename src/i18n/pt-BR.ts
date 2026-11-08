@@ -16,7 +16,6 @@ export const ptBR: Strings = {
     knight: "Cavaleiro",
   },
   round: {
-    misses: (n: number, max: number) => `Erros: ${n} de ${max}`,
     won: "O Haru está livre!",
     lost: "Não deu para salvar o Haru",
     wordWas: "A palavra era",

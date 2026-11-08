@@ -16,7 +16,6 @@ export const en = {
     knight: "Knight",
   },
   round: {
-    misses: (n: number, max: number) => `Misses: ${n} of ${max}`,
     won: "Haru is free!",
     lost: "Haru didn't make it",
     wordWas: "The word was",
