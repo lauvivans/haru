@@ -19,6 +19,7 @@ export interface PeerLink {
 export interface RoomState {
   full: boolean;
   peerName: string | null; // the other player, once they said their nickname
+  first: boolean; // this player was in the room before the other joined
   link: PeerLink | null;
 }
 
@@ -44,6 +45,7 @@ function linkOf(channel: RTCDataChannel): PeerLink {
 export function useRoom(code: string, name: string | null): RoomState {
   const [full, setFull] = useState(false);
   const [peerName, setPeerName] = useState<string | null>(null);
+  const [first, setFirst] = useState(false);
   const [channel, setChannel] = useState<RTCDataChannel | null>(null);
 
   useEffect(() => {
@@ -84,12 +86,14 @@ export function useRoom(code: string, name: string | null): RoomState {
           setFull(true);
           break;
         case 'peer-joined': {
+          setFirst(true);
           const connection = connect();
           await connection.setLocalDescription();
           signal('offer', connection.localDescription);
           break;
         }
         case 'offer': {
+          setFirst(false);
           const connection = connect();
           await connection.setRemoteDescription(message.data);
           await connection.setLocalDescription();
@@ -129,5 +133,5 @@ export function useRoom(code: string, name: string | null): RoomState {
   }, [channel, name]);
 
   const link = useMemo(() => channel && linkOf(channel), [channel]);
-  return { full, peerName, link };
+  return { full, peerName, first, link };
 }

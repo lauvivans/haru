@@ -38,9 +38,10 @@ export function isHint(value: string) {
   return HINT.test(value) && value.trim() === value;
 }
 
-// The room creator picks the word in the first round, then the roles swap
-export function picksRound(index: number, creator: boolean) {
-  return (index % 2 === 0) === creator;
+// The player who was in the room first (its creator, in a new room) picks the
+// first word, then the roles swap
+export function picksRound(index: number, first: boolean) {
+  return (index % 2 === 0) === first;
 }
 
 export function statusOf(round: DuoRound) {
@@ -48,17 +49,17 @@ export function statusOf(round: DuoRound) {
 }
 
 // Applies a move from this player (byMe) or the other one. A move out of turn is dropped.
-export function play(rounds: DuoRound[], move: Move, byMe: boolean, creator: boolean) {
+export function play(rounds: DuoRound[], move: Move, byMe: boolean, first: boolean) {
   const current = rounds.at(-1);
   const playing = current !== undefined && statusOf(current) === 'playing';
 
   if (move.type === 'word') {
-    if (playing || picksRound(rounds.length, creator) !== byMe) return rounds;
+    if (playing || picksRound(rounds.length, first) !== byMe) return rounds;
     return [...rounds, { word: move.word, hint: move.hint, guesses: [] }];
   }
   if (
     !playing ||
-    picksRound(rounds.length - 1, creator) === byMe ||
+    picksRound(rounds.length - 1, first) === byMe ||
     current.guesses.includes(move.letter)
   ) {
     return rounds;
@@ -67,12 +68,12 @@ export function play(rounds: DuoRound[], move: Move, byMe: boolean, creator: boo
 }
 
 // The guesser wins the round by saving Haru, the picker when Haru isn't saved
-export function scoreOf(rounds: DuoRound[], creator: boolean) {
+export function scoreOf(rounds: DuoRound[], first: boolean) {
   const score = { me: 0, peer: 0 };
   rounds.forEach((round, index) => {
     const status = statusOf(round);
     if (status === 'playing') return;
-    const picker = picksRound(index, creator);
+    const picker = picksRound(index, first);
     if ((status === 'won') !== picker) score.me++;
     else score.peer++;
   });

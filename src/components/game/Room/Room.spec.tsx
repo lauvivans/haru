@@ -164,7 +164,8 @@ describe('Room', () => {
     await fromServer({ type: 'peer-joined' });
     await openChannel();
     await fromPeer({ type: 'hello', nickname: 'Ana' });
-    expect(screen.getByRole('heading', { name: 'Ana is picking a word…' })).toBeTruthy();
+    // Joined by link, but was in the room first, so picks first
+    expect(screen.getByRole('heading', { name: 'Pick a word for Ana' })).toBeTruthy();
 
     await fromServer({ type: 'peer-disconnected' });
     expect(screen.getByRole('heading', { name: 'Invite a friend' })).toBeTruthy();

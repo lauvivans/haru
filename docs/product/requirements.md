@@ -47,7 +47,7 @@ What Haru does and the rules the game follows.
 
 - One player creates a room and gets a link with a short room code to send to the other player. Opening the link joins the room.
 - A room holds exactly two players. A third person who opens the link sees that the room is full.
-- The player who created the room starts as the one who picks the word. Roles swap every round.
+- The player who created the room starts as the one who picks the word. Roles swap every round. If a player leaves and comes back, the one who stayed picks first.
 - The word has 2 to 24 characters: letters (accents and `Ç` allowed), spaces and hyphens. It is typed hidden, with a button to show it.
 - The picker can add an optional hint, up to 40 characters.
 - Both players see the same board: blanks, used letters and the gallows. Only the guesser picks letters.

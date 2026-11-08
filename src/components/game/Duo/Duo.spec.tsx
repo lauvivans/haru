@@ -34,7 +34,7 @@ function setup(creator: boolean) {
   const [name, peerName] = creator ? ['Laura', 'Ana'] : ['Ana', 'Laura'];
   render(
     <MemoryRouter>
-      <Duo link={link} creator={creator} name={name} peerName={peerName} />
+      <Duo link={link} first={creator} name={name} peerName={peerName} />
     </MemoryRouter>,
   );
   return user;

@@ -73,9 +73,8 @@ function RoomScreen({ code }: RoomCodeProps) {
   const t = useStrings().room;
   const { state } = useLocation();
   // The creator typed a nickname on the page before; a friend types it here
-  const creator = createdHere(state);
-  const [name, setName] = useState(() => (creator && nickname.get()) || null);
-  const { full, peerName, link } = useRoom(code, name);
+  const [name, setName] = useState(() => (createdHere(state) && nickname.get()) || null);
+  const { full, peerName, first, link } = useRoom(code, name);
 
   if (full) return <RoomFull />;
 
@@ -96,7 +95,7 @@ function RoomScreen({ code }: RoomCodeProps) {
 
   if (!peerName || !link) return <Invite code={code} />;
 
-  return <Duo link={link} creator={creator} name={name} peerName={peerName} />;
+  return <Duo link={link} first={first} name={name} peerName={peerName} />;
 }
 
 // A room link: /room/<code>. A new code starts a new connection.

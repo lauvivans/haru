@@ -10,26 +10,26 @@ import { useStrings } from '@/i18n/i18n';
 
 interface DuoProps {
   link: PeerLink;
-  creator: boolean;
+  first: boolean;
   name: string;
   peerName: string;
 }
 
 // Two-player rounds. Both players keep the same rounds: each applies its own moves
 // and the other player's, so the board and the score match on both sides.
-export function Duo({ link, creator, name, peerName }: DuoProps) {
+export function Duo({ link, first, name, peerName }: DuoProps) {
   const t = useStrings().duo;
   const [rounds, setRounds] = useState<DuoRound[]>([]);
   // Rounds whose end dialog this player has left with "Next round"
   const [seen, setSeen] = useState(0);
 
   useEffect(
-    () => link.listen((move) => setRounds((r) => play(r, move, false, creator))),
-    [link, creator],
+    () => link.listen((move) => setRounds((r) => play(r, move, false, first))),
+    [link, first],
   );
 
   function move(m: Move) {
-    const next = play(rounds, m, true, creator);
+    const next = play(rounds, m, true, first);
     if (next === rounds) return;
     setRounds(next);
     link.send(m);
@@ -40,8 +40,8 @@ export function Duo({ link, creator, name, peerName }: DuoProps) {
   const board =
     current && (statusOf(current) === 'playing' || seen < rounds.length) ? current : null;
   const index = board ? rounds.length - 1 : rounds.length;
-  const picking = picksRound(index, creator);
-  const score = scoreOf(rounds, creator);
+  const picking = picksRound(index, first);
+  const score = scoreOf(rounds, first);
   const roleOf = (picks: boolean) => (picks ? t.picks : t.guesses);
 
   function screen() {

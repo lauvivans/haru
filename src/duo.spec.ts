@@ -13,8 +13,8 @@ import {
 const word = (value: string): Move => ({ type: 'word', word: value, hint: '' });
 const guess = (letter: string): Move => ({ type: 'guess', letter });
 
-function playAll(moves: [Move, boolean][], creator: boolean) {
-  return moves.reduce<DuoRound[]>((rounds, [move, byMe]) => play(rounds, move, byMe, creator), []);
+function playAll(moves: [Move, boolean][], first: boolean) {
+  return moves.reduce<DuoRound[]>((rounds, [move, byMe]) => play(rounds, move, byMe, first), []);
 }
 
 describe('duo', () => {
@@ -55,7 +55,7 @@ describe('duo', () => {
   });
 
   describe('picksRound', () => {
-    it('gives the first round to the creator and swaps every round', () => {
+    it('gives the first round to the player who was in the room first and swaps every round', () => {
       expect([0, 1, 2].map((i) => picksRound(i, true))).toEqual([true, false, true]);
       expect([0, 1, 2].map((i) => picksRound(i, false))).toEqual([false, true, false]);
     });
