@@ -33,7 +33,7 @@ export function Duo({ code, link, first, name, peerName }: DuoProps) {
   // Rounds whose end dialog this player has left with "Next round"
   const [seen, setSeen] = useState(0);
   // Rounds from an earlier connection in this room still count for the score
-  const [past] = useState(() => savedScore(code));
+  const [past] = useState(() => savedScore(code, name));
 
   useEffect(
     () => link.listen((move) => setRounds((r) => play(r, move, false, first))),
@@ -56,8 +56,8 @@ export function Duo({ code, link, first, name, peerName }: DuoProps) {
   const score = scoreOf(rounds, first, past);
 
   useEffect(
-    () => saveScore(code, { me: score.me, peer: score.peer }),
-    [code, score.me, score.peer],
+    () => saveScore(code, name, { me: score.me, peer: score.peer }),
+    [code, name, score.me, score.peer],
   );
 
   const roleOf = (picks: boolean) => (picks ? t.picks : t.guesses);

@@ -170,7 +170,7 @@ describe('Duo', () => {
   });
 
   it('keeps counting from the score saved for the room', async () => {
-    localStorage.setItem('haru-score-K7QXAB', JSON.stringify({ me: 2, peer: 1 }));
+    localStorage.setItem('haru-score-K7QXAB-Ana', JSON.stringify({ me: 2, peer: 1 }));
     const user = setup(false);
     expect(points()).toBe('2 × 1');
 
@@ -179,7 +179,10 @@ describe('Duo', () => {
     await user.click(key('E'));
 
     expect(points()).toBe('3 × 1');
-    expect(JSON.parse(localStorage.getItem('haru-score-K7QXAB') ?? '')).toEqual({ me: 3, peer: 1 });
+    expect(JSON.parse(localStorage.getItem('haru-score-K7QXAB-Ana') ?? '')).toEqual({
+      me: 3,
+      peer: 1,
+    });
   });
 
   it('starts the next round when the word arrives before the end dialog is left', async () => {

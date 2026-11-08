@@ -74,7 +74,7 @@ interface PlayerLeftProps {
 function PlayerLeft({ code, name, peerName, onWait }: PlayerLeftProps) {
   const t = useStrings().room.left;
   const locale = useLocale();
-  const score = savedScore(code);
+  const score = savedScore(code, name);
 
   return (
     <Panel className="narrow stack center">

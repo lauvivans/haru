@@ -142,9 +142,16 @@ describe('duo', () => {
     afterEach(() => localStorage.clear());
 
     it('reads back the score saved for a room, whatever the case of the code', () => {
-      saveScore('k7qxab', { me: 2, peer: 1 });
-      expect(savedScore('K7QXAB')).toEqual({ me: 2, peer: 1 });
-      expect(savedScore('ZZZZZZ')).toEqual({ me: 0, peer: 0 });
+      saveScore('k7qxab', 'Laura', { me: 2, peer: 1 });
+      expect(savedScore('K7QXAB', 'Laura')).toEqual({ me: 2, peer: 1 });
+      expect(savedScore('ZZZZZZ', 'Laura')).toEqual({ me: 0, peer: 0 });
+    });
+
+    it('keeps each side apart when both players share one browser', () => {
+      saveScore('K7QXAB', 'Laura', { me: 0, peer: 1 });
+      saveScore('K7QXAB', 'Ana', { me: 1, peer: 0 });
+      expect(savedScore('K7QXAB', 'Laura')).toEqual({ me: 0, peer: 1 });
+      expect(savedScore('K7QXAB', 'Ana')).toEqual({ me: 1, peer: 0 });
     });
 
     it('drops a saved score that the game could not have written', () => {
@@ -156,8 +163,8 @@ describe('duo', () => {
         '{"me":"2","peer":0}',
         '{"me":10001,"peer":0}',
       ]) {
-        localStorage.setItem('haru-score-K7QXAB', saved);
-        expect(savedScore('K7QXAB')).toEqual({ me: 0, peer: 0 });
+        localStorage.setItem('haru-score-K7QXAB-Laura', saved);
+        expect(savedScore('K7QXAB', 'Laura')).toEqual({ me: 0, peer: 0 });
       }
     });
   });

@@ -87,7 +87,8 @@ export function scoreOf(rounds: DuoRound[], first: boolean, past: Score = { me: 
 
 // Far more rounds than one session plays; a bigger number didn't come from the game
 const MAX_POINTS = 10_000;
-const scoreKey = (code: string) => `haru-score-${code.toUpperCase()}`;
+// Keyed by the player too: two tabs of one browser share storage, each with its own side
+const scoreKey = (code: string, name: string) => `haru-score-${code.toUpperCase()}-${name}`;
 
 function isPoints(value: unknown): value is number {
   return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= MAX_POINTS;
@@ -95,9 +96,9 @@ function isPoints(value: unknown): value is number {
 
 // The room's score is kept in this browser, so it survives a player leaving and coming
 // back with the same link. Storage is untrusted and can be blocked: a bad value is 0 × 0.
-export function savedScore(code: string): Score {
+export function savedScore(code: string, name: string): Score {
   try {
-    const saved: unknown = JSON.parse(localStorage.getItem(scoreKey(code)) ?? 'null');
+    const saved: unknown = JSON.parse(localStorage.getItem(scoreKey(code, name)) ?? 'null');
     if (
       typeof saved === 'object' &&
       saved !== null &&
@@ -114,9 +115,9 @@ export function savedScore(code: string): Score {
   return { me: 0, peer: 0 };
 }
 
-export function saveScore(code: string, score: Score) {
+export function saveScore(code: string, name: string, score: Score) {
   try {
-    localStorage.setItem(scoreKey(code), JSON.stringify({ me: score.me, peer: score.peer }));
+    localStorage.setItem(scoreKey(code, name), JSON.stringify({ me: score.me, peer: score.peer }));
   } catch {
     /* storage blocked */
   }
