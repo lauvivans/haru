@@ -103,6 +103,51 @@ export const en = {
     hintRule: 'Up to 40 characters.',
     start: 'Start round',
   },
+  howItWorks: {
+    title: 'How it works',
+    game: {
+      title: 'The game',
+      intro:
+        'Haru is on the gallows. The word shows as one blank per letter. Pick one letter at a time:',
+      rules: [
+        'If the letter is in the word, it shows everywhere it appears.',
+        "If it isn't, one more piece of the gallows goes up. On the 7th miss the trapdoor opens.",
+        "Accents don't count: picking A also reveals Á, Â, Ã and À, and C reveals Ç.",
+      ],
+      solo: 'Solo:',
+      soloText: 'a random word, with its category as a hint.',
+      friend: 'With a friend:',
+      friendText:
+        'one player picks the word and an optional hint, the other guesses. Roles swap every round and the room keeps the score.',
+    },
+    p2p: {
+      title: 'Peer-to-peer',
+      intro:
+        "In a game with a friend, the two browsers talk to each other directly. Haru's server only introduces them.",
+      steps: [
+        {
+          title: 'Signaling.',
+          text: 'Each browser tells the server how it can be reached. The server passes this on to the other player. STUN helps each browser find its public address.',
+        },
+        {
+          title: 'Data channel.',
+          text: 'The browsers open a WebRTC channel between them and the moves go through it. If a network blocks the direct path, a TURN server relays the moves.',
+        },
+      ],
+      storesNothing: 'The server stores nothing. The room only exists in memory while it is open.',
+    },
+    diagram: {
+      label:
+        'Two browsers connected by a data channel, with a signaling server above and a TURN relay below',
+      signaling: 'Signaling',
+      introduces: 'introduces the players',
+      you: 'Your browser',
+      friend: "Friend's browser",
+      moves: '2 · moves',
+      relay: 'TURN relay, only if the direct path is blocked',
+    },
+    play: 'Play now',
+  },
   solo: {
     categories: {
       animals: 'Animals',

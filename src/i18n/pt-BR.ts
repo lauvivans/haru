@@ -104,6 +104,52 @@ export const ptBR: Strings = {
     hintRule: 'Até 40 caracteres.',
     start: 'Começar rodada',
   },
+  howItWorks: {
+    title: 'Como funciona',
+    game: {
+      title: 'O jogo',
+      intro:
+        'O Haru está na forca. A palavra aparece com um espaço por letra. Escolha uma letra por vez:',
+      rules: [
+        'Se a letra está na palavra, ela aparece em todas as posições.',
+        'Se não está, mais uma peça da forca é montada. No 7º erro o alçapão abre.',
+        'Acentos não contam: escolher A revela também Á, Â, Ã e À, e C revela Ç.',
+      ],
+      solo: 'Solo:',
+      soloText: 'uma palavra sorteada, com a categoria como dica.',
+      friend: 'Com um amigo:',
+      friendText:
+        'um jogador escolhe a palavra e uma dica opcional, o outro adivinha. Os papéis trocam a cada rodada e a sala guarda o placar.',
+    },
+    p2p: {
+      title: 'Peer-to-peer',
+      intro:
+        'Numa partida com um amigo, os dois navegadores conversam direto. O servidor do Haru só apresenta um ao outro.',
+      steps: [
+        {
+          title: 'Sinalização.',
+          text: 'Cada navegador conta ao servidor como pode ser encontrado, e o servidor repassa isso ao outro jogador. O STUN ajuda cada navegador a descobrir o próprio endereço público.',
+        },
+        {
+          title: 'Canal de dados.',
+          text: 'Os navegadores abrem um canal WebRTC entre eles e as jogadas passam por ali. Se uma rede bloqueia o caminho direto, um servidor TURN repassa as jogadas.',
+        },
+      ],
+      storesNothing:
+        'O servidor não guarda nada. A sala só existe na memória enquanto está aberta.',
+    },
+    diagram: {
+      label:
+        'Dois navegadores ligados por um canal de dados, com o servidor de sinalização acima e um repasse TURN abaixo',
+      signaling: 'Sinalização',
+      introduces: 'apresenta os jogadores',
+      you: 'Seu navegador',
+      friend: 'Navegador do amigo',
+      moves: '2 · jogadas',
+      relay: 'TURN repassa, só se o caminho direto estiver bloqueado',
+    },
+    play: 'Jogar agora',
+  },
   solo: {
     categories: {
       animals: 'Animais',
