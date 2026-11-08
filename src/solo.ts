@@ -26,7 +26,7 @@ export function playedIn(locale: Locale): string[] {
   }
 }
 
-// A word not played yet. Once the list runs out, it starts over.
+// A word not played yet. Once the list runs out, it starts over without the current word.
 export function pickWord(locale: Locale, random = Math.random): SoloWord {
   const all = wordsIn(locale);
   const played = playedIn(locale);
@@ -40,7 +40,7 @@ export function markPlayed(locale: Locale, word: string) {
   if (played.includes(word)) return;
   const next = [...played, word];
   try {
-    localStorage.setItem(keyOf(locale), JSON.stringify(next.length >= wordsIn(locale).length ? [] : next));
+    localStorage.setItem(keyOf(locale), JSON.stringify(next.length >= wordsIn(locale).length ? [word] : next));
   } catch {
     /* storage blocked */
   }

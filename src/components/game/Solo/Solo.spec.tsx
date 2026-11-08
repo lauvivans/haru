@@ -2,6 +2,7 @@ import { act, cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { Locale } from "@/i18n/locale";
 import { CATEGORIES, wordLists } from "@/words/words";
 import { Solo } from "./Solo";
 
@@ -9,11 +10,9 @@ import { Solo } from "./Solo";
 vi.mock("@/pixel/gallows", () => ({ mountGallows: () => ({ update() {}, stop() {} }) }));
 vi.mock("@/pixel/haru", () => ({ mountSprite: () => ({ update() {}, stop() {} }) }));
 
-const allBut = (locale: "en" | "pt-BR", word: string) =>
-  CATEGORIES.flatMap((c) => wordLists[locale][c]).filter((w) => w !== word);
-
-function playedOnlyLeaves(locale: "en" | "pt-BR", word: string) {
-  localStorage.setItem(`haru-played-${locale}`, JSON.stringify(allBut(locale, word)));
+function playedOnlyLeaves(locale: Locale, word: string) {
+  const others = CATEGORIES.flatMap((c) => wordLists[locale][c]).filter((w) => w !== word);
+  localStorage.setItem(`haru-played-${locale}`, JSON.stringify(others));
 }
 
 function setup(path: string) {
@@ -60,13 +59,15 @@ describe("Solo", () => {
     expect(screen.getByText("CAT")).toBeTruthy();
   });
 
-  it("starts over when play again is picked after the last word", async () => {
+  it("starts over without the last word when play again is picked after it", async () => {
     playedOnlyLeaves("en", "cat");
     const user = setup("/solo");
     await guess(user, "CAT");
     act(() => vi.advanceTimersByTime(2000));
     await user.click(screen.getByRole("button", { name: "Play again" }));
     expect(screen.queryByRole("dialog")).toBeNull();
-    expect(JSON.parse(localStorage.getItem("haru-played-en") ?? "")).toHaveLength(1);
+    const played: unknown = JSON.parse(localStorage.getItem("haru-played-en") ?? "");
+    expect(played).toHaveLength(2);
+    expect(played).toContain("cat");
   });
 });

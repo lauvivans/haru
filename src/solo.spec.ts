@@ -27,10 +27,11 @@ describe("solo words", () => {
     expect(playedIn("pt-BR")).toEqual([]);
   });
 
-  it("starts over once the list runs out", () => {
+  it("starts over without the current word once the list runs out", () => {
     localStorage.setItem(KEY, JSON.stringify(words.slice(1)));
     markPlayed("en", words[0]);
-    expect(playedIn("en")).toEqual([]);
+    expect(playedIn("en")).toEqual([words[0]]);
+    expect(pickWord("en").word).not.toBe(words[0]);
   });
 
   it.each([

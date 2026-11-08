@@ -2,15 +2,19 @@ import { useEffect, useState } from "react";
 import { Round } from "@/components/game/Round/Round";
 import { useLocale, useStrings } from "@/i18n/i18n";
 import type { Locale } from "@/i18n/locale";
-import { markPlayed, pickWord } from "@/solo";
+import { markPlayed, pickWord, type SoloWord } from "@/solo";
 
 interface SoloRoundProps {
   locale: Locale;
 }
 
+interface SoloState extends SoloWord {
+  guesses: string[];
+}
+
 function SoloRound({ locale }: SoloRoundProps) {
   const t = useStrings().solo;
-  const [round, setRound] = useState(() => ({ ...pickWord(locale), guesses: [] as string[] }));
+  const [round, setRound] = useState<SoloState>(() => ({ ...pickWord(locale), guesses: [] }));
 
   useEffect(() => {
     markPlayed(locale, round.word);
