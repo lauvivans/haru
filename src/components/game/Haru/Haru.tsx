@@ -1,17 +1,17 @@
 import { useEffect, useRef } from 'react';
 import { mountSprite, type Look, type Mood, type SpriteSize } from '@/pixel/haru';
 
-type Props = {
+interface HaruProps {
   mood?: Mood;
   guesses?: number; // changes on every guess, so the same mood reacts again
   size?: SpriteSize;
   look?: Look; // a fixed look; otherwise the player's choice
   title?: string;
   onClick?: () => void;
-};
+}
 
 // Haru alone, for the landing, cards and dialogs
-export function Haru({ mood = 'idle', guesses = 0, size = 'md', look, title, onClick }: Props) {
+export function Haru({ mood = 'idle', guesses = 0, size = 'md', look, title, onClick }: HaruProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   const sprite = useRef<ReturnType<typeof mountSprite>>(null);
 
