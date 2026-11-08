@@ -16,11 +16,21 @@ import { pathIn } from '@/i18n/locale';
 // Lets the win or the trapdoor play before the dialog covers the stage
 const END_DELAY_MS = 1600;
 
+// The end dialog's texts. Solo uses the defaults; two players name who saved Haru.
+export interface RoundEnding {
+  won: string;
+  note?: string;
+  next: string;
+  leave: string;
+}
+
 interface RoundProps {
   word: string;
+  message?: string; // above the board, such as who picked the word
   hint?: string; // the category, or the hint from the player who picked the word
   guesses: readonly string[]; // letters picked so far, A to Z
   canGuess?: boolean; // false for the player who picked the word
+  ending?: RoundEnding;
   onGuess: (letter: string) => void;
   onPlayAgain: () => void;
 }
@@ -36,8 +46,18 @@ function moodOf(
   return hit(lastGuess) ? 'hit' : 'miss';
 }
 
-export function Round({ word, hint, guesses, canGuess = true, onGuess, onPlayAgain }: RoundProps) {
+export function Round({
+  word,
+  message,
+  hint,
+  guesses,
+  canGuess = true,
+  ending,
+  onGuess,
+  onPlayAgain,
+}: RoundProps) {
   const t = useStrings().round;
+  const end = ending ?? { won: t.won, next: t.playAgain, leave: t.backHome };
   const locale = useLocale();
   const { groups, misses, status, hit } = roundOf(word, guesses);
   const over = status !== 'playing';
@@ -77,6 +97,7 @@ export function Round({ word, hint, guesses, canGuess = true, onGuess, onPlayAga
   return (
     <>
       <div className="board">
+        {message && <p className="status">{message}</p>}
         <div className="stage-wrap">
           <Gallows misses={misses} mood={mood} guesses={guesses.length} />
         </div>
@@ -111,15 +132,16 @@ export function Round({ word, hint, guesses, canGuess = true, onGuess, onPlayAga
         <div className="overlay">
           <Panel className="result" role="dialog" aria-labelledby="round-end">
             <Haru mood={mood} />
-            <h2 id="round-end">{status === 'won' ? t.won : t.lost}</h2>
+            <h2 id="round-end">{status === 'won' ? end.won : t.lost}</h2>
             <p className="muted">{t.wordWas}</p>
             <p className="result__word">{word.toUpperCase()}</p>
+            {end.note && <p>{end.note}</p>}
             <div className="result__actions">
               <Button autoFocus onClick={onPlayAgain}>
-                {t.playAgain}
+                {end.next}
               </Button>
               <Link className="btn btn--ghost" to={pathIn(locale, '/')}>
-                {t.backHome}
+                {end.leave}
               </Link>
             </div>
           </Panel>

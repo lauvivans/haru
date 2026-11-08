@@ -88,8 +88,27 @@ describe('room', () => {
     it('drops other messages and bad nicknames', () => {
       expect(parsePeerMessage(json({ type: 'hello', nickname: 'a'.repeat(17) }))).toBeNull();
       expect(parsePeerMessage(json({ type: 'hello', nickname: 7 }))).toBeNull();
-      expect(parsePeerMessage(json({ type: 'guess', letter: 'A' }))).toBeNull();
+      expect(parsePeerMessage(json({ type: 'move', letter: 'A' }))).toBeNull();
       expect(parsePeerMessage('{')).toBeNull();
+    });
+
+    it('accepts a valid word with its hint and a guess from A to Z', () => {
+      const word = { type: 'word', word: 'Guarda-chuva', hint: 'Rainy day' };
+      expect(parsePeerMessage(json({ ...word, extra: 1 }))).toEqual(word);
+      expect(parsePeerMessage(json({ type: 'guess', letter: 'Q' }))).toEqual({
+        type: 'guess',
+        letter: 'Q',
+      });
+    });
+
+    it('drops a bad word, hint or letter', () => {
+      const word = { type: 'word', word: 'casa', hint: '' };
+      expect(parsePeerMessage(json({ ...word, word: 'casa1' }))).toBeNull();
+      expect(parsePeerMessage(json({ ...word, word: 'a'.repeat(25) }))).toBeNull();
+      expect(parsePeerMessage(json({ ...word, hint: 'a'.repeat(41) }))).toBeNull();
+      expect(parsePeerMessage(json({ type: 'word', word: 'casa' }))).toBeNull();
+      expect(parsePeerMessage(json({ type: 'guess', letter: 'a' }))).toBeNull();
+      expect(parsePeerMessage(json({ type: 'guess', letter: 'AB' }))).toBeNull();
     });
   });
 });

@@ -52,6 +52,6 @@ What Haru does and the rules the game follows.
 - The picker can add an optional hint, up to 40 characters.
 - Both players see the same board: blanks, used letters and the gallows. Only the guesser picks letters.
 - Before joining a room, each player types a nickname of 1 to 16 characters. It shows in the room and in the score, and the browser remembers it for the next room.
-- The room keeps the score of the session: rounds won by each player.
+- The room keeps the score of the session: rounds won by each player. The guesser wins a round by saving Haru; if Haru isn't saved, the picker wins it.
 - If a player leaves or loses the connection, the other sees a message and can wait in the room or go back home.
 - Game moves go directly between the two browsers (WebRTC). The server only helps them connect and keeps the room in memory while it is open. See [decision 001](../decisions/001-stack-and-hosting.md).

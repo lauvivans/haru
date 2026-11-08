@@ -1,8 +1,8 @@
 import { useId, useState } from 'react';
 import { Link, Navigate, useLocation, useParams } from 'react-router';
+import { Duo } from '@/components/game/Duo/Duo';
 import { Haru } from '@/components/game/Haru/Haru';
 import { NicknameForm } from '@/components/game/NicknameForm/NicknameForm';
-import { Player } from '@/components/game/Player/Player';
 import { Button } from '@/components/ui/Button/Button';
 import { Panel } from '@/components/ui/Panel/Panel';
 import { useRoom } from '@/hooks/useRoom';
@@ -73,8 +73,9 @@ function RoomScreen({ code }: RoomCodeProps) {
   const t = useStrings().room;
   const { state } = useLocation();
   // The creator typed a nickname on the page before; a friend types it here
-  const [name, setName] = useState(() => (createdHere(state) && nickname.get()) || null);
-  const { full, peerName } = useRoom(code, name);
+  const creator = createdHere(state);
+  const [name, setName] = useState(() => (creator && nickname.get()) || null);
+  const { full, peerName, link } = useRoom(code, name);
 
   if (full) return <RoomFull />;
 
@@ -93,22 +94,9 @@ function RoomScreen({ code }: RoomCodeProps) {
     );
   }
 
-  if (!peerName) return <Invite code={code} />;
+  if (!peerName || !link) return <Invite code={code} />;
 
-  // TODO(#28): start the first round here
-  return (
-    <>
-      <div className="score">
-        <Player name={name} />
-        <span className="score__points">0 × 0</span>
-        <Player name={peerName} />
-      </div>
-      <Panel className="narrow stack center">
-        <Haru mood="win" />
-        <h1>{t.playingWith(peerName)}</h1>
-      </Panel>
-    </>
-  );
+  return <Duo link={link} creator={creator} name={name} peerName={peerName} />;
 }
 
 // A room link: /room/<code>. A new code starts a new connection.
