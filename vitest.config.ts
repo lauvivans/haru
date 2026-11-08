@@ -1,10 +1,17 @@
 import { cloudflareTest } from "@cloudflare/vitest-plugin";
 import { defineConfig } from "vitest/config";
 
-// Worker tests run inside workerd with the bindings from wrangler.jsonc.
 export default defineConfig({
-  plugins: [cloudflareTest({ wrangler: { configPath: "./wrangler.jsonc" } })],
   test: {
-    include: ["worker/**/*.spec.ts"],
+    projects: [
+      {
+        // Worker tests run inside workerd with the bindings from wrangler.jsonc.
+        plugins: [cloudflareTest({ wrangler: { configPath: "./wrangler.jsonc" } })],
+        test: { name: "worker", include: ["worker/**/*.spec.ts"] },
+      },
+      {
+        test: { name: "app", include: ["src/**/*.spec.ts"] },
+      },
+    ],
   },
 });
