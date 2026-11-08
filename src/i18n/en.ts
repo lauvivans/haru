@@ -39,6 +39,39 @@ export const en = {
     playAgain: 'Play again',
     backHome: 'Back home',
   },
+  nickname: {
+    look: 'Your Haru',
+    label: 'Your nickname',
+    hint: '1 to 16 characters. Your browser remembers it.',
+  },
+  room: {
+    create: {
+      title: 'Play with a friend',
+      submit: 'Create room',
+      failed: "The room couldn't be created. Try again.",
+    },
+    join: {
+      title: 'Join the room',
+      invitedBy: (name: string) => `${name} invited you`,
+      submit: 'Join room',
+    },
+    invite: {
+      title: 'Invite a friend',
+      intro: 'Send this link. The game starts when your friend joins.',
+      link: 'Room link',
+      copy: 'Copy',
+      waiting: 'Waiting for your friend…',
+    },
+    code: 'Room code',
+    room: 'Room',
+    playingWith: (name: string) => `Playing with ${name}`,
+    full: {
+      title: 'This room is full',
+      intro: 'A room holds two players. You can create your own room or play solo.',
+      create: 'Create a room',
+      solo: 'Play solo',
+    },
+  },
   solo: {
     categories: {
       animals: 'Animals',
