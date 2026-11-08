@@ -40,6 +40,39 @@ export const ptBR: Strings = {
     playAgain: 'Jogar de novo',
     backHome: 'Voltar ao início',
   },
+  nickname: {
+    look: 'Seu Haru',
+    label: 'Seu apelido',
+    hint: 'De 1 a 16 caracteres. O navegador guarda para a próxima vez.',
+  },
+  room: {
+    create: {
+      title: 'Jogar com um amigo',
+      submit: 'Criar sala',
+      failed: 'Não deu para criar a sala. Tente de novo.',
+    },
+    join: {
+      title: 'Entrar na sala',
+      invitedBy: (name: string) => `${name} te convidou`,
+      submit: 'Entrar na sala',
+    },
+    invite: {
+      title: 'Convide um amigo',
+      intro: 'Mande este link. O jogo começa quando seu amigo entrar.',
+      link: 'Link da sala',
+      copy: 'Copiar',
+      waiting: 'Esperando seu amigo…',
+    },
+    code: 'Código da sala',
+    room: 'Sala',
+    playingWith: (name: string) => `Jogando com ${name}`,
+    full: {
+      title: 'Esta sala está cheia',
+      intro: 'Cada sala tem dois jogadores. Você pode criar a sua sala ou jogar sozinho.',
+      create: 'Criar uma sala',
+      solo: 'Jogar sozinho',
+    },
+  },
   solo: {
     categories: {
       animals: 'Animais',

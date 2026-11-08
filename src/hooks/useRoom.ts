@@ -1,0 +1,108 @@
+import { useEffect, useState } from 'react';
+import { parsePeerMessage, parseServerMessage, type ServerMessage } from '@/room';
+
+// TURN for strict networks comes with #23 (decision 001)
+const ICE_SERVERS: RTCIceServer[] = [{ urls: 'stun:stun.cloudflare.com:3478' }];
+
+function roomUrl(code: string) {
+  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${protocol}//${location.host}/rooms/${code.toUpperCase()}`;
+}
+
+export interface RoomState {
+  full: boolean;
+  peerName: string | null; // the other player, once they said their nickname
+}
+
+// Joins the room's signaling socket and connects to the other player over WebRTC.
+// The player already in the room makes the offer when someone joins, so there is
+// never an offer from both sides. `name` is sent once the data channel opens.
+export function useRoom(code: string, name: string | null): RoomState {
+  const [full, setFull] = useState(false);
+  const [peerName, setPeerName] = useState<string | null>(null);
+  const [channel, setChannel] = useState<RTCDataChannel | null>(null);
+
+  useEffect(() => {
+    const socket = new WebSocket(roomUrl(code));
+    let peer: RTCPeerConnection | null = null;
+    // Handled one at a time, so a candidate never lands before its offer or answer
+    let queue = Promise.resolve();
+
+    const signal = (type: string, data: object | null) => {
+      if (data && socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type, data }));
+    };
+
+    function hangUp() {
+      peer?.close();
+      peer = null;
+      setChannel(null);
+      setPeerName(null);
+    }
+
+    function connect() {
+      hangUp();
+      const connection = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+      // Negotiated on both sides with the same id, so no ondatachannel round trip
+      const dataChannel = connection.createDataChannel('game', { negotiated: true, id: 0 });
+      dataChannel.onopen = () => setChannel(dataChannel);
+      dataChannel.onmessage = (event) => {
+        const message = parsePeerMessage(event.data);
+        if (message?.type === 'hello') setPeerName(message.nickname);
+      };
+      connection.onicecandidate = (event) => signal('ice-candidate', event.candidate);
+      peer = connection;
+      return connection;
+    }
+
+    async function handle(message: ServerMessage) {
+      switch (message.type) {
+        case 'room-full':
+          setFull(true);
+          break;
+        case 'peer-joined': {
+          const connection = connect();
+          await connection.setLocalDescription();
+          signal('offer', connection.localDescription);
+          break;
+        }
+        case 'offer': {
+          const connection = connect();
+          await connection.setRemoteDescription(message.data);
+          await connection.setLocalDescription();
+          signal('answer', connection.localDescription);
+          break;
+        }
+        case 'answer':
+          await peer?.setRemoteDescription(message.data);
+          break;
+        case 'ice-candidate':
+          if (peer?.remoteDescription) await peer.addIceCandidate(message.data);
+          break;
+        case 'peer-disconnected':
+          hangUp();
+          break;
+      }
+    }
+
+    socket.onmessage = (event) => {
+      const message = parseServerMessage(event.data);
+      if (!message) return;
+      // A failed step leaves this attempt behind; the next join starts a new one
+      queue = queue.then(() => handle(message)).catch(() => {});
+    };
+
+    return () => {
+      socket.onmessage = null;
+      socket.close();
+      peer?.close();
+    };
+  }, [code]);
+
+  useEffect(() => {
+    if (channel?.readyState === 'open' && name) {
+      channel.send(JSON.stringify({ type: 'hello', nickname: name }));
+    }
+  }, [channel, name]);
+
+  return { full, peerName };
+}

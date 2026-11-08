@@ -7,13 +7,7 @@ import prettier from 'eslint-config-prettier';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
-  globalIgnores([
-    'dist',
-    '.wrangler',
-    'worker-configuration.d.ts',
-    // TODO(#27): lint again once #27 replaces this Fastify-era code.
-    'src/context',
-  ]),
+  globalIgnores(['dist', '.wrangler', 'worker-configuration.d.ts']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
