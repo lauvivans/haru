@@ -126,7 +126,7 @@ Stack and hosting follow decision 001: client and signaling on one Cloudflare Wo
 
 ## Tests
 
-Vitest comes with the first rules to test (#24) and runs in CI (#14). Before implementing, map the most important cases: main behavior, edge cases and critical flows.
+`npm test` runs Vitest. Worker tests (`worker/*.spec.ts`) run inside workerd through `@cloudflare/vitest-plugin`; the app tests come with #24 and CI with #14. Before implementing, map the most important cases: main behavior, edge cases and critical flows.
 
 What needs a test:
 

@@ -15,7 +15,7 @@ Follow the guidelines below when implementing and when reviewing PRs. They are i
 ## Commands
 
 - `npm run dev`: client and Worker together through the Cloudflare Vite plugin. Node version is in `.nvmrc`.
-- `npm run lint`, `npm run typecheck`, `npm run build`.
+- `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
 - `npm run cf-typegen`: generates `worker-configuration.d.ts` (not committed).
 
 ## Workflow
