@@ -141,6 +141,24 @@ describe('Room', () => {
     expect(screen.getByText('Laura')).toBeTruthy();
   });
 
+  it('goes back to the invite when the friend leaves, and connects again when they return', async () => {
+    nickname.set('Laura');
+    setup(`/room/${CODE}`);
+    await userEvent.click(screen.getByRole('button', { name: 'Join room' }));
+    await fromServer({ type: 'peer-joined' });
+    await openChannel();
+    await fromPeer({ type: 'hello', nickname: 'Ana' });
+    expect(screen.getByRole('heading', { name: 'Playing with Ana' })).toBeTruthy();
+
+    await fromServer({ type: 'peer-disconnected' });
+    expect(screen.getByRole('heading', { name: 'Invite a friend' })).toBeTruthy();
+
+    const first = FakePeer.last;
+    await fromServer({ type: 'peer-joined' });
+    expect(FakePeer.last).not.toBe(first);
+    expect(FakeSocket.last.sent.filter((s) => s.type === 'offer')).toHaveLength(2);
+  });
+
   it('tells the player when the room could not be created', async () => {
     vi.stubGlobal(
       'fetch',
