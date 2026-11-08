@@ -144,7 +144,7 @@ How:
 - Mock only the edges: WebRTC, the signaling socket, `localStorage`, `matchMedia`, the canvas. Don't mock child components, contexts or internal helpers.
 - Reset mocks between tests (`vi.restoreAllMocks()` in `afterEach`).
 - One top-level `describe` naming what is under test. Nested `describe` blocks only to separate contexts.
-- Before opening the PR, `npm run typecheck`, the tests and `npm run build` pass, and lint passes on the files the PR touches (`npx eslint <files>`). The whole repo has to pass `npm run lint` once the old signaling code is replaced (#22).
+- Before opening the PR, `npm run typecheck`, the tests and `npm run build` pass, and lint passes on the files the PR touches (`npx eslint <files>`). The whole repo has to pass `npm run lint` once the code left from the Fastify version (`src/context/`, `src/hooks/useChannel.ts`, the old `Welcome` and `Hangman` screens) is replaced.
 
 ## Reviewing a PR
 
