@@ -1,0 +1,35 @@
+import type { WordList } from "./words";
+
+export const ptBR: WordList = {
+  animals: [
+    "gato", "cachorro", "cavalo", "vaca", "ovelha", "cabra", "porco", "galinha", "pato", "coelho",
+    "tatu", "capivara", "jacaré", "onça", "tamanduá", "preguiça", "papagaio", "arara", "tucano",
+    "beija-flor", "sabiá", "macaco", "sapo", "jabuti", "borboleta", "formiga", "abelha", "golfinho",
+    "baleia", "tubarão",
+  ],
+  food: [
+    "pão", "queijo", "arroz", "feijão", "farofa", "mandioca", "tapioca", "açaí", "goiabada",
+    "brigadeiro", "pamonha", "cuscuz", "coxinha", "pastel", "mingau", "canjica", "paçoca",
+    "quindim", "moqueca", "feijoada", "pão de queijo", "banana", "caju", "manga", "goiaba",
+    "abacaxi", "laranja", "melancia", "maracujá", "chuchu",
+  ],
+  countries: [
+    "brasil", "portugal", "angola", "moçambique", "cabo verde", "espanha", "frança", "itália",
+    "alemanha", "irlanda", "noruega", "suécia", "polônia", "grécia", "egito", "marrocos", "quênia",
+    "índia", "china", "japão", "canadá", "méxico", "peru", "chile", "argentina", "colômbia",
+    "uruguai", "paraguai", "bolívia", "austrália",
+  ],
+  objects: [
+    "cadeira", "mesa", "vassoura", "balde", "panela", "chaleira", "garrafa", "colher", "garfo",
+    "faca", "prato", "travesseiro", "cobertor", "espelho", "vela", "lanterna", "guarda-chuva",
+    "chave", "relógio", "tesoura", "mochila", "carteira", "caneta", "caderno", "violão",
+    "bicicleta", "janela", "martelo", "escada", "rede",
+  ],
+  jobs: [
+    "padeiro", "agricultor", "professor", "médico", "enfermeiro", "dentista", "advogado", "piloto",
+    "cozinheiro", "pintor", "encanador", "carpinteiro", "ferreiro", "bombeiro", "mecânico",
+    "feirante", "jardineiro", "costureira", "açougueiro", "pescador", "garçom", "músico",
+    "sapateiro", "escritor", "jangadeiro", "engenheiro", "vaqueiro", "jornalista", "fotógrafo",
+    "eletricista",
+  ],
+};
