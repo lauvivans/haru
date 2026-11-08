@@ -60,9 +60,17 @@ Without TURN, players behind strict NATs (some mobile networks and corporate net
 - The README section on building coturn on EC2 stays as study notes, marked as not used in production.
 - Haru doesn't go on the EC2. If the infra repo already has a container or Caddy route for it, they are removed.
 
+## Domain and deploys
+
+Settled on 2026-11-08 in [#15](https://github.com/lauvivans/haru/issues/15).
+
+- **Production:** `haru.arualvivan.com`, a custom domain on the Worker `haru`, the same zone as Gaku. Production has no `workers.dev` or preview URL. Every push to `main` runs CI and deploys it (`production.yml`).
+- **Staging:** the Worker `haru-staging` at its `workers.dev` URL. Every push to `develop` runs CI and deploys it (`staging.yml`). It has its own Durable Objects, so rooms on staging and production never mix.
+- Both call `deploy.yml`, and a deploy never cancels another one on the same environment.
+- The workflows read two repository secrets: `CLOUDFLARE_API_TOKEN` (an API token from the "Edit Cloudflare Workers" template, with the zone resource set to `arualvivan.com`) and `CLOUDFLARE_ACCOUNT_ID`.
+
 ## Open questions
 
-- **Domain.** A `workers.dev` subdomain or a custom domain.
 - **Abuse limits.** A cap on rooms per IP, or none for the beta.
 
 ## Sources
