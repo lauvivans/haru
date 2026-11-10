@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Move } from '@/duo';
 import { parsePeerMessage, parseServerMessage, type ServerMessage } from '@/room';
 
-// TURN for strict networks comes with #23 (decision 001)
-const ICE_SERVERS: RTCIceServer[] = [{ urls: 'stun:stun.cloudflare.com:3478' }];
+// Enough for most home networks. The room sends TURN for the strict ones (decision 001)
+const STUN_ONLY: RTCIceServer[] = [{ urls: 'stun:stun.cloudflare.com:3478' }];
 
 function roomUrl(code: string) {
   const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -54,6 +54,7 @@ export function useRoom(code: string, name: string | null): RoomState {
     const socket = new WebSocket(roomUrl(code));
     let peer: RTCPeerConnection | null = null;
     let peerNickname: string | null = null;
+    let iceServers = STUN_ONLY;
     // Handled one at a time, so a candidate never lands before its offer or answer
     let queue = Promise.resolve();
 
@@ -72,7 +73,7 @@ export function useRoom(code: string, name: string | null): RoomState {
     function connect() {
       hangUp();
       setLeft(null);
-      const connection = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+      const connection = new RTCPeerConnection({ iceServers });
       // Negotiated on both sides with the same id, so no ondatachannel round trip
       const dataChannel = connection.createDataChannel('game', { negotiated: true, id: 0 });
       dataChannel.onopen = () => setChannel(dataChannel);
@@ -89,6 +90,10 @@ export function useRoom(code: string, name: string | null): RoomState {
 
     async function handle(message: ServerMessage) {
       switch (message.type) {
+        // Sent by the room right before the offer, fresh every time two players meet
+        case 'ice-servers':
+          iceServers = message.data;
+          break;
         case 'room-full':
           setFull(true);
           break;

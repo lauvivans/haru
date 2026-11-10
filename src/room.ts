@@ -20,12 +20,39 @@ export const nickname = stored<string>('haru-nickname', () => '', isNickname);
 export type ServerMessage =
   | { type: 'peer-joined' | 'peer-disconnected' | 'room-full' }
   | { type: 'offer' | 'answer'; data: RTCSessionDescriptionInit }
-  | { type: 'ice-candidate'; data: RTCIceCandidateInit };
+  | { type: 'ice-candidate'; data: RTCIceCandidateInit }
+  | { type: 'ice-servers'; data: RTCIceServer[] };
 
 export type PeerMessage = { type: 'hello'; nickname: string } | Move;
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
+}
+
+// Cloudflare sends 2 servers with 7 URLs. Room to grow, but a huge list is not ours
+const MAX_ICE_SERVERS = 8;
+const MAX_ICE_URLS = 32;
+const ICE_URL = /^(stun|turns?):[\w.:?=-]{1,200}$/;
+
+function parseIceServer(value: unknown): RTCIceServer | null {
+  if (!isObject(value)) return null;
+  const { urls, username, credential } = value;
+  const list: unknown[] = Array.isArray(urls) ? urls : [urls];
+  const valid = list.filter((url): url is string => typeof url === 'string' && ICE_URL.test(url));
+  if (valid.length === 0 || valid.length !== list.length || valid.length > MAX_ICE_URLS) {
+    return null;
+  }
+  if (username === undefined && credential === undefined) return { urls: valid };
+  if (typeof username !== 'string' || typeof credential !== 'string') return null;
+  return { urls: valid, username, credential };
+}
+
+function parseIceServers(value: Record<string, unknown>): RTCIceServer[] | null {
+  const { iceServers } = value;
+  if (!Array.isArray(iceServers) || iceServers.length === 0) return null;
+  if (iceServers.length > MAX_ICE_SERVERS) return null;
+  const servers = iceServers.map(parseIceServer);
+  return servers.every((server): server is RTCIceServer => server !== null) ? servers : null;
 }
 
 function parseJson(message: unknown): Record<string, unknown> | null {
@@ -48,6 +75,10 @@ export function parseServerMessage(message: unknown): ServerMessage | null {
     return { type };
   }
   if (!isObject(data)) return null;
+  if (type === 'ice-servers') {
+    const servers = parseIceServers(data);
+    return servers && { type, data: servers };
+  }
   if ((type === 'offer' || type === 'answer') && data.type === type) {
     return typeof data.sdp === 'string' ? { type, data: { type, sdp: data.sdp } } : null;
   }
