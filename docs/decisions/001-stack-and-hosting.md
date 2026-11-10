@@ -43,19 +43,31 @@ Trystero is the strongest option without a backend. It stays the fallback if the
 
 Without TURN, players behind strict NATs (some mobile networks and corporate networks) can't connect at all. STUN alone is enough for most home networks.
 
-| Option                                   | Cost                      | Notes                                                       |
-| ---------------------------------------- | ------------------------- | ----------------------------------------------------------- |
-| **Cloudflare Realtime TURN (chosen)**    | $0.05 per GB              | Credentials created by the Worker; same account             |
-| Google public STUN only                  | $0                        | Fails behind symmetric NAT                                  |
-| Metered Open Relay                       | 20 GB per month free      | Needs sign-up and an API key; no published SLA              |
-| ExpressTURN                              | 1,000 GB per month free   | No published uptime or SLA                                  |
-| coturn on the EC2                        | Share of the EC2          | The setup the README describes; brings the EC2 back         |
+| Option                                | Cost                                    | Notes                                               |
+| ------------------------------------- | --------------------------------------- | --------------------------------------------------- |
+| **Cloudflare Realtime TURN (chosen)** | $0.05 per GB after a 1,000 GB free tier | Credentials created by the Worker; same account     |
+| Google public STUN only               | $0                                      | Fails behind symmetric NAT                          |
+| Metered Open Relay                    | 20 GB per month free                    | Needs sign-up and an API key; no published SLA      |
+| ExpressTURN                           | 1,000 GB per month free                 | No published uptime or SLA                          |
+| coturn on the EC2                     | Share of the EC2                        | The setup the README describes; brings the EC2 back |
+
+### Limits on TURN
+
+Settled in [#59](https://github.com/lauvivans/haru/issues/59). TURN is billed by usage, so the Worker keeps it bounded.
+
+- **Daily cap.** A room only asks Cloudflare for credentials while the `TurnBudget` Durable Object has some left for the UTC day (`DAILY_CREDENTIALS_CAP` in `worker/turn.ts`, 100). Past the cap, the room sends no `ice-servers` message and the players try STUN only.
+- **TTL of 4 hours.** Cloudflare disconnects a relayed connection shortly after its credential expires, so a shorter TTL would cut long sessions. A room creates new credentials every time two players meet.
+
+### Turning TURN off by hand
+
+1. Delete the secret on both Workers: `wrangler secret delete TURN_KEY_API_TOKEN` and `wrangler secret delete TURN_KEY_API_TOKEN --env staging`. Rooms then fail to create credentials and players connect with STUN only. Put the secret back with `wrangler secret put` to turn TURN on again.
+2. Credentials already handed out keep working until they expire, at most 4 hours later. To end one sooner, revoke it with `POST https://rtc.live.cloudflare.com/v1/turn/keys/<TURN key ID>/credentials/<username>/revoke` and the TURN key API token as a bearer token; Cloudflare answers 204. The Worker doesn't keep the usernames, so this needs the username from the `ice-servers` message a player received.
 
 ## Consequences
 
 - `server/` is rewritten as a Worker with a Durable Object class. The message types (`offer`, `answer`, `ice-candidate`, `peer-disconnected`) stay, and peers join by room code instead of typing the other player's peer ID.
 - The client connects to `wss://<haru domain>/rooms/<code>` on the same origin, so `VITE_SERVER_URL` goes away in production.
-- The TURN key is a Worker secret. An endpoint returns credentials that expire, and the client fetches them before creating the `RTCPeerConnection`.
+- The TURN key is a Worker secret. When two players meet in a room, the room sends both of them credentials that expire, before the offer starts the connection.
 - The solo mode needs no network after the page loads.
 - The README section on building coturn on EC2 stays as study notes, marked as not used in production.
 - Haru doesn't go on the EC2. If the infra repo already has a container or Caddy route for it, they are removed.
@@ -75,11 +87,11 @@ Settled on 2026-11-08 in [#15](https://github.com/lauvivans/haru/issues/15).
 
 ## Sources
 
-Official pages, checked on 2026-11-07.
+Official pages, checked on 2026-11-07. The TURN FAQ, for the limits on TURN, on 2026-11-10.
 
 - [Durable Objects pricing](https://developers.cloudflare.com/durable-objects/platform/pricing/)
 - [Workers static assets billing](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/)
-- [Cloudflare Realtime TURN](https://developers.cloudflare.com/realtime/turn/) and [TURN credentials](https://developers.cloudflare.com/realtime/turn/generate-credentials/)
+- [Cloudflare Realtime TURN](https://developers.cloudflare.com/realtime/turn/), [TURN credentials](https://developers.cloudflare.com/realtime/turn/generate-credentials/) and [TURN FAQ](https://developers.cloudflare.com/realtime/turn/faq/)
 - [Trystero](https://github.com/dmotz/trystero)
 - [P2PCF](https://github.com/gfodor/p2pcf)
 - [PeerJS docs](https://peerjs.com/docs)
