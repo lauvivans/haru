@@ -2,12 +2,13 @@ import { DurableObject } from 'cloudflare:workers';
 
 // https://developers.cloudflare.com/realtime/turn/generate-credentials/
 const TURN_KEYS_API = 'https://rtc.live.cloudflare.com/v1/turn/keys';
-// Cloudflare drops a relayed connection shortly after its credential expires, so the
-// TTL has to outlast a long session of rounds. A room asks for new ones every time two players meet.
-const CREDENTIALS_TTL_SECONDS = 4 * 60 * 60;
-// TURN is billed by usage (#59). A game relays well under 1 MB, so this many
-// meetings a day stay far inside the 1,000 GB free tier.
-export const DAILY_CREDENTIALS_CAP = 100;
+// Cloudflare drops a relayed connection shortly after its credential expires, so a room
+// sends new ones while two players are still in it, with time to spare (#63).
+export const CREDENTIALS_TTL_SECONDS = 15 * 60;
+export const CREDENTIALS_REFRESH_MS = 10 * 60 * 1000;
+// TURN is billed by usage (#59). Every meeting and every refresh takes one, so this
+// covers about 15 games of 30 minutes a day, the expected use of the beta (#63).
+export const DAILY_CREDENTIALS_CAP = 50;
 
 interface DailyCount {
   day: string;
