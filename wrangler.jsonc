@@ -25,6 +25,10 @@
         "name": "ROOMS",
         "class_name": "Room",
       },
+      {
+        "name": "TURN_BUDGET",
+        "class_name": "TurnBudget",
+      },
     ],
   },
   // The Free plan only runs SQLite-backed Durable Objects.
@@ -32,6 +36,10 @@
     {
       "tag": "v1",
       "new_sqlite_classes": ["Room"],
+    },
+    {
+      "tag": "v2",
+      "new_sqlite_classes": ["TurnBudget"],
     },
   ],
   "env": {
@@ -49,6 +57,10 @@
           {
             "name": "ROOMS",
             "class_name": "Room",
+          },
+          {
+            "name": "TURN_BUDGET",
+            "class_name": "TurnBudget",
           },
         ],
       },

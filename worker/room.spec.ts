@@ -1,6 +1,7 @@
-import { evictDurableObject } from 'cloudflare:test';
+import { evictDurableObject, runInDurableObject } from 'cloudflare:test';
 import { env, exports } from 'cloudflare:workers';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { DAILY_CREDENTIALS_CAP } from './turn';
 
 const ORIGIN = 'https://haru.test';
 const offer = { type: 'offer', data: { type: 'offer', sdp: 'v=0 offer' } };
@@ -65,7 +66,14 @@ function turnAnswers(response: () => Response) {
   return vi.spyOn(globalThis, 'fetch').mockImplementation(async () => response());
 }
 
-beforeEach(() => {
+const budget = () => env.TURN_BUDGET.getByName('daily');
+
+async function useUpDailyCredentials() {
+  for (let i = 0; i < DAILY_CREDENTIALS_CAP; i++) await budget().take();
+}
+
+beforeEach(async () => {
+  await runInDurableObject(budget(), (_, state) => state.storage.deleteAll());
   vi.spyOn(console, 'error').mockImplementation(() => {});
   turnAnswers(() => new Response('unavailable', { status: 503 }));
 });
@@ -73,6 +81,7 @@ beforeEach(() => {
 afterEach(() => {
   openSockets.splice(0).forEach((socket) => socket.close());
   vi.restoreAllMocks();
+  vi.useRealTimers();
 });
 
 describe('Room', () => {
@@ -98,6 +107,30 @@ describe('Room', () => {
     );
     expect(new Headers(init?.headers).get('Authorization')).toBe('Bearer test-token');
     expect(init?.body).toBe(JSON.stringify({ ttl: 4 * 60 * 60 }));
+  });
+
+  it('connects the players with STUN only past the daily TURN cap', async () => {
+    await useUpDailyCredentials();
+    const turn = turnAnswers(() => Response.json(ICE_SERVERS, { status: 201 }));
+
+    const { second } = await joinPair();
+    expect(second.messages).toEqual([]);
+    expect(turn).not.toHaveBeenCalled();
+  });
+
+  it('hands out TURN credentials again on the next UTC day', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-10T23:59:00Z'));
+    await useUpDailyCredentials();
+
+    vi.setSystemTime(new Date('2026-11-11T00:00:00Z'));
+    turnAnswers(() => Response.json(ICE_SERVERS, { status: 201 }));
+    const code = await newRoom();
+    await join(code);
+    const second = await join(code);
+    await vi.waitFor(() =>
+      expect(second.messages).toEqual([{ type: 'ice-servers', data: ICE_SERVERS }]),
+    );
   });
 
   it('still connects the players with STUN only when TURN fails', async () => {
