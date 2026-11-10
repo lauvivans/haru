@@ -90,9 +90,10 @@ export function useRoom(code: string, name: string | null): RoomState {
 
     async function handle(message: ServerMessage) {
       switch (message.type) {
-        // Sent by the room right before the offer, fresh every time two players meet
+        // Sent by the room right before the offer, and again before the credentials expire
         case 'ice-servers':
           iceServers = message.data;
+          peer?.setConfiguration({ ...peer.getConfiguration(), iceServers });
           break;
         case 'room-full':
           setFull(true);

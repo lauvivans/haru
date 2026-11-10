@@ -1,4 +1,4 @@
-import { evictDurableObject, runInDurableObject } from 'cloudflare:test';
+import { evictDurableObject, runDurableObjectAlarm, runInDurableObject } from 'cloudflare:test';
 import { env, exports } from 'cloudflare:workers';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DAILY_CREDENTIALS_CAP } from './turn';
@@ -106,7 +106,56 @@ describe('Room', () => {
       'https://rtc.live.cloudflare.com/v1/turn/keys/test-key/credentials/generate-ice-servers',
     );
     expect(new Headers(init?.headers).get('Authorization')).toBe('Bearer test-token');
-    expect(init?.body).toBe(JSON.stringify({ ttl: 4 * 60 * 60 }));
+    expect(init?.body).toBe(JSON.stringify({ ttl: 15 * 60 }));
+  });
+
+  describe('while two players stay in the room', () => {
+    const iceServers = { type: 'ice-servers', data: ICE_SERVERS };
+
+    async function meetWithTurn() {
+      const turn = turnAnswers(() => Response.json(ICE_SERVERS, { status: 201 }));
+      const code = await newRoom();
+      const first = await join(code);
+      const second = await join(code);
+      await vi.waitFor(() => expect(second.messages).toEqual([iceServers]));
+      return { room: env.ROOMS.getByName(code), turn, first, second };
+    }
+
+    it('sends both players new TURN credentials before the old ones expire', async () => {
+      const { room, turn, first, second } = await meetWithTurn();
+      const scheduled = await runInDurableObject(room, (_, state) => state.storage.getAlarm());
+      expect(scheduled).toBeGreaterThan(Date.now() + 9 * 60 * 1000);
+      expect(scheduled).toBeLessThan(Date.now() + 15 * 60 * 1000);
+
+      expect(await runDurableObjectAlarm(room)).toBe(true);
+      await vi.waitFor(() => expect(second.messages).toEqual([iceServers, iceServers]));
+      expect(first.messages).toEqual([iceServers, { type: 'peer-joined' }, iceServers]);
+      expect(turn).toHaveBeenCalledTimes(2);
+
+      expect(await runDurableObjectAlarm(room)).toBe(true);
+      await vi.waitFor(() => expect(second.messages).toHaveLength(3));
+    });
+
+    it('counts every refresh against the daily cap and stops past it', async () => {
+      const { room, turn, second } = await meetWithTurn();
+      for (let i = 1; i < DAILY_CREDENTIALS_CAP; i++) await budget().take();
+      expect(await budget().take()).toBe(false);
+
+      expect(await runDurableObjectAlarm(room)).toBe(true);
+      expect(second.messages).toEqual([iceServers]);
+      expect(turn).toHaveBeenCalledTimes(1);
+      expect(await runDurableObjectAlarm(room)).toBe(false);
+    });
+
+    it('stops refreshing once a player leaves', async () => {
+      const { room, turn, first, second } = await meetWithTurn();
+      second.socket.close(1000, 'bye');
+      await vi.waitFor(() => expect(first.messages).toContainEqual({ type: 'peer-disconnected' }));
+
+      expect(await runDurableObjectAlarm(room)).toBe(true);
+      expect(turn).toHaveBeenCalledTimes(1);
+      expect(await runDurableObjectAlarm(room)).toBe(false);
+    });
   });
 
   it('connects the players with STUN only past the daily TURN cap', async () => {

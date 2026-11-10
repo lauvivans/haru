@@ -53,15 +53,15 @@ Without TURN, players behind strict NATs (some mobile networks and corporate net
 
 ### Limits on TURN
 
-Settled in [#59](https://github.com/lauvivans/haru/issues/59). TURN is billed by usage, so the Worker keeps it bounded.
+Settled in [#59](https://github.com/lauvivans/haru/issues/59) and tightened in [#63](https://github.com/lauvivans/haru/issues/63). TURN is billed by usage, so the Worker keeps it bounded.
 
-- **Daily cap.** A room only asks Cloudflare for credentials while the `TurnBudget` Durable Object has some left for the UTC day (`DAILY_CREDENTIALS_CAP` in `worker/turn.ts`, 100). Past the cap, the room sends no `ice-servers` message and the players try STUN only.
-- **TTL of 4 hours.** Cloudflare disconnects a relayed connection shortly after its credential expires, so a shorter TTL would cut long sessions. A room creates new credentials every time two players meet.
+- **TTL of 15 minutes, refreshed.** A room creates credentials when two players meet. While both stay, a Durable Object alarm creates new ones every 10 minutes and sends them to the two players, and the client applies them with `RTCPeerConnection.setConfiguration()` ([Cloudflare docs](https://developers.cloudflare.com/realtime/turn/generate-credentials/)). Cloudflare disconnects a relayed connection shortly after its credential expires, so the 5 minutes left over cover a late alarm. When a player leaves, the refreshes stop.
+- **Daily cap of 50.** A room only asks Cloudflare for credentials while the `TurnBudget` Durable Object has some left for the UTC day (`DAILY_CREDENTIALS_CAP` in `worker/turn.ts`). Every meeting and every refresh takes one, so a 30-minute game takes 3 and the cap covers about 15 such games a day, the expected use of the beta. Past the cap, a meeting gets no `ice-servers` message and the players try STUN only; a game already in progress gets no refresh, so a relayed one drops when its credentials expire.
 
 ### Turning TURN off by hand
 
 1. Delete the secret on both Workers: `wrangler secret delete TURN_KEY_API_TOKEN` and `wrangler secret delete TURN_KEY_API_TOKEN --env staging`. Rooms then fail to create credentials and players connect with STUN only. Put the secret back with `wrangler secret put` to turn TURN on again.
-2. Credentials already handed out keep working until they expire, at most 4 hours later. To end one sooner, revoke it with `POST https://rtc.live.cloudflare.com/v1/turn/keys/<TURN key ID>/credentials/<username>/revoke` and the TURN key API token as a bearer token; Cloudflare answers 204. The Worker doesn't keep the usernames, so this needs the username from the `ice-servers` message a player received.
+2. Credentials already handed out keep working until they expire, at most 15 minutes later. To end one sooner, revoke it with `POST https://rtc.live.cloudflare.com/v1/turn/keys/<TURN key ID>/credentials/<username>/revoke` and the TURN key API token as a bearer token; Cloudflare answers 204. The Worker doesn't keep the usernames, so this needs the username from the `ice-servers` message a player received.
 
 ## Consequences
 

@@ -1,5 +1,5 @@
 import { DurableObject } from 'cloudflare:workers';
-import { createIceServers } from './turn';
+import { CREDENTIALS_REFRESH_MS, createIceServers } from './turn';
 
 const MAX_PLAYERS = 2;
 // An offer with every ICE candidate inlined is a few KB. Anything far bigger is not signaling.
@@ -79,16 +79,24 @@ export class Room extends DurableObject<Env> {
     this.leave(socket);
   }
 
-  // TURN credentials only go to players who share a room, so there is no open
-  // endpoint to mint them. Both get them before the offer starts the connection.
+  // Credentials expire, so a game that goes on gets new ones before they do
+  async alarm() {
+    if (this.openSockets().length === MAX_PLAYERS) await this.sendIceServers();
+  }
+
+  // Both players get credentials before the offer starts the connection
   private async meet(newcomer: WebSocket) {
-    const iceServers = await createIceServers(this.env);
-    if (iceServers) {
-      this.openSockets().forEach((player) =>
-        send(player, { type: 'ice-servers', data: iceServers }),
-      );
-    }
+    await this.sendIceServers();
     this.othersThan(newcomer).forEach((other) => send(other, { type: 'peer-joined' }));
+  }
+
+  // TURN credentials only go to players who share a room, so there is no open
+  // endpoint to mint them. Past the daily cap the players keep what they have.
+  private async sendIceServers() {
+    const iceServers = await createIceServers(this.env);
+    if (!iceServers) return;
+    this.openSockets().forEach((player) => send(player, { type: 'ice-servers', data: iceServers }));
+    await this.ctx.storage.setAlarm(Date.now() + CREDENTIALS_REFRESH_MS);
   }
 
   private leave(socket: WebSocket) {
