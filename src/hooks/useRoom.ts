@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Move } from '@/duo';
+import { fetchIceServers } from '@/ice';
 import { parsePeerMessage, parseServerMessage, type ServerMessage } from '@/room';
-
-// TURN for strict networks comes with #23 (decision 001)
-const ICE_SERVERS: RTCIceServer[] = [{ urls: 'stun:stun.cloudflare.com:3478' }];
 
 function roomUrl(code: string) {
   const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -54,6 +52,7 @@ export function useRoom(code: string, name: string | null): RoomState {
     const socket = new WebSocket(roomUrl(code));
     let peer: RTCPeerConnection | null = null;
     let peerNickname: string | null = null;
+    let active = true;
     // Handled one at a time, so a candidate never lands before its offer or answer
     let queue = Promise.resolve();
 
@@ -69,10 +68,14 @@ export function useRoom(code: string, name: string | null): RoomState {
       setPeerName(null);
     }
 
-    function connect() {
+    // New TURN credentials on every connection, so they never expire mid-game
+    async function connect() {
       hangUp();
       setLeft(null);
-      const connection = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+      const iceServers = await fetchIceServers();
+      // Left the room while waiting: the queue's catch drops this attempt
+      if (!active) throw new Error('Room left');
+      const connection = new RTCPeerConnection({ iceServers });
       // Negotiated on both sides with the same id, so no ondatachannel round trip
       const dataChannel = connection.createDataChannel('game', { negotiated: true, id: 0 });
       dataChannel.onopen = () => setChannel(dataChannel);
@@ -94,14 +97,14 @@ export function useRoom(code: string, name: string | null): RoomState {
           break;
         case 'peer-joined': {
           setFirst(true);
-          const connection = connect();
+          const connection = await connect();
           await connection.setLocalDescription();
           signal('offer', connection.localDescription);
           break;
         }
         case 'offer': {
           setFirst(false);
-          const connection = connect();
+          const connection = await connect();
           await connection.setRemoteDescription(message.data);
           await connection.setLocalDescription();
           signal('answer', connection.localDescription);
@@ -128,6 +131,7 @@ export function useRoom(code: string, name: string | null): RoomState {
     };
 
     return () => {
+      active = false;
       socket.onmessage = null;
       socket.close();
       peer?.close();

@@ -1,3 +1,5 @@
+import { iceServers } from './turn';
+
 export { Room } from './room';
 
 // No 0, 1, I or O, so a code read aloud or typed from a phone is not misread.
@@ -18,6 +20,10 @@ export default {
 
     if (pathname === '/rooms' && request.method === 'POST') {
       return Response.json({ code: newRoomCode() });
+    }
+
+    if (pathname === '/ice-servers' && request.method === 'GET') {
+      return iceServers(env);
     }
 
     const code = ROOM_PATH.exec(pathname)?.[1];

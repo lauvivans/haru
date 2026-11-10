@@ -7,7 +7,12 @@ export default defineConfig({
     projects: [
       {
         // Worker tests run inside workerd with the bindings from wrangler.jsonc.
-        plugins: [cloudflareTest({ wrangler: { configPath: './wrangler.jsonc' } })],
+        plugins: [
+          cloudflareTest({
+            wrangler: { configPath: './wrangler.jsonc' },
+            miniflare: { bindings: { TURN_KEY_ID: 'test-key', TURN_KEY_API_TOKEN: 'test-token' } },
+          }),
+        ],
         test: { name: 'worker', include: ['worker/**/*.spec.ts'] },
       },
       {

@@ -24,7 +24,7 @@ export type ServerMessage =
 
 export type PeerMessage = { type: 'hello'; nickname: string } | Move;
 
-function isObject(value: unknown): value is Record<string, unknown> {
+export function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
 
