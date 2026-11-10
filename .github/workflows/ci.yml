@@ -3,13 +3,15 @@ name: CI
 on:
   pull_request:
     branches: [main, develop]
+  # Reused by the staging and production workflows before deploying.
+  workflow_call:
 
 permissions:
   contents: read
 
 # A new push to a PR cancels its previous run.
 concurrency:
-  group: ci-${{ github.event.pull_request.number }}
+  group: ci-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -44,10 +46,10 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: npm run lint
 
-      # Only the files the PR changes are checked. Files in .prettierignore
-      # are skipped.
+      # Only the files the PR changes are checked. Runs after a push skip it,
+      # since the PR already checked them. Files in .prettierignore are skipped.
       - name: Check formatting of changed files
-        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.install.outcome == 'success' && github.base_ref != '' }}
         env:
           BASE: ${{ github.base_ref }}
         run: |
