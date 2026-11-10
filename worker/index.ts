@@ -1,4 +1,5 @@
 export { Room } from './room';
+export { TurnBudget } from './turn';
 
 // No 0, 1, I or O, so a code read aloud or typed from a phone is not misread.
 // 32 symbols, so a random byte maps to one without bias.
