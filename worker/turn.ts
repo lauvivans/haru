@@ -1,12 +1,12 @@
 // https://developers.cloudflare.com/realtime/turn/generate-credentials/
 const TURN_KEYS_API = 'https://rtc.live.cloudflare.com/v1/turn/keys';
 // A relayed connection keeps using these credentials, so they outlive a long
-// session of rounds. The client asks for new ones on every connection.
+// session of rounds. A room asks for new ones every time two players meet.
 const CREDENTIALS_TTL_SECONDS = 4 * 60 * 60;
 
-// The TURN key stays here as a Worker secret; the client only gets
-// credentials that expire (decision 001).
-export async function iceServers(env: Env): Promise<Response> {
+// The TURN key stays here as a Worker secret; players only get credentials
+// that expire (decision 001). Null when Cloudflare can't make them.
+export async function createIceServers(env: Env): Promise<object | null> {
   const response = await fetch(
     `${TURN_KEYS_API}/${env.TURN_KEY_ID}/credentials/generate-ice-servers`,
     {
@@ -21,9 +21,8 @@ export async function iceServers(env: Env): Promise<Response> {
 
   if (!response?.ok) {
     console.error('TURN credentials failed', response?.status ?? 'network error');
-    return new Response('TURN unavailable', { status: 502 });
+    return null;
   }
-  return new Response(response.body, {
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
-  });
+  const body: unknown = await response.json().catch(() => null);
+  return typeof body === 'object' ? body : null;
 }

@@ -61,6 +61,37 @@ describe('room', () => {
       });
     });
 
+    it('accepts the STUN and TURN servers the room sends', () => {
+      const turn = {
+        urls: ['turn:turn.cloudflare.com:3478?transport=udp', 'turns:turn.cloudflare.com:443'],
+        username: 'user',
+        credential: 'secret',
+      };
+      const data = { iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }, turn] };
+      expect(parseServerMessage(json({ type: 'ice-servers', data }))).toEqual({
+        type: 'ice-servers',
+        data: [{ urls: ['stun:stun.cloudflare.com:3478'] }, turn],
+      });
+    });
+
+    it('drops ICE servers off shape, foreign URLs or lists too long', () => {
+      const turn = { urls: ['turn:turn.cloudflare.com:3478'], username: 'u', credential: 'c' };
+      const dropped = [
+        {},
+        { iceServers: [] },
+        { iceServers: [{ urls: [] }] },
+        { iceServers: [{ urls: ['https://evil.test'] }] },
+        { iceServers: [{ urls: ['stun:ok.test', 42] }] },
+        { iceServers: [{ ...turn, credential: undefined }] },
+        { iceServers: [{ ...turn, username: 7 }] },
+        { iceServers: Array.from({ length: 9 }, () => turn) },
+        { iceServers: [{ urls: Array.from({ length: 33 }, () => 'stun:ok.test') }] },
+      ];
+      for (const data of dropped) {
+        expect(parseServerMessage(json({ type: 'ice-servers', data }))).toBeNull();
+      }
+    });
+
     it('drops anything else', () => {
       const dropped = [
         'not json',

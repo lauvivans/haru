@@ -1,4 +1,5 @@
 import { DurableObject } from 'cloudflare:workers';
+import { createIceServers } from './turn';
 
 const MAX_PLAYERS = 2;
 // An offer with every ICE candidate inlined is a few KB. Anything far bigger is not signaling.
@@ -39,11 +40,11 @@ function send(socket: WebSocket, message: object) {
   socket.send(JSON.stringify(message));
 }
 
-// One object per room code. It only relays signaling between the two players and
-// keeps nothing about the game (see the Security section of the engineering guidelines).
+// One object per room code. It relays signaling between the two players, hands them
+// TURN credentials and keeps nothing about the game (see the Security section of the engineering guidelines).
 // Sockets go through ctx.acceptWebSocket so an idle room hibernates and bills no duration.
 export class Room extends DurableObject<Env> {
-  fetch(request: Request) {
+  async fetch(request: Request) {
     if (request.headers.get('Upgrade')?.toLowerCase() !== 'websocket') {
       return new Response('Expected a WebSocket', { status: 426 });
     }
@@ -57,7 +58,7 @@ export class Room extends DurableObject<Env> {
       server.close(1008, 'Room full');
     } else {
       this.ctx.acceptWebSocket(server);
-      players.forEach((player) => send(player, { type: 'peer-joined' }));
+      if (players.length > 0) await this.meet(server);
     }
 
     return new Response(null, { status: 101, webSocket: client });
@@ -76,6 +77,18 @@ export class Room extends DurableObject<Env> {
 
   webSocketError(socket: WebSocket) {
     this.leave(socket);
+  }
+
+  // TURN credentials only go to players who share a room, so there is no open
+  // endpoint to mint them. Both get them before the offer starts the connection.
+  private async meet(newcomer: WebSocket) {
+    const iceServers = await createIceServers(this.env);
+    if (iceServers) {
+      this.openSockets().forEach((player) =>
+        send(player, { type: 'ice-servers', data: iceServers }),
+      );
+    }
+    this.othersThan(newcomer).forEach((other) => send(other, { type: 'peer-joined' }));
   }
 
   private leave(socket: WebSocket) {
