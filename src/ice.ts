@@ -2,9 +2,9 @@ import { isObject } from '@/room';
 
 // Enough for most home networks; TURN is for the strict ones (decision 001)
 export const STUN_ONLY: RTCIceServer[] = [{ urls: 'stun:stun.cloudflare.com:3478' }];
-// Cloudflare returns 2 servers with 7 URLs in total; anything far bigger is not ours
-const MAX_SERVERS = 4;
-const MAX_URLS = 10;
+// Cloudflare returns 2 servers with 7 URLs. Room to grow, but a huge list is not ours
+const MAX_SERVERS = 8;
+const MAX_URLS = 32;
 const ICE_URL = /^(stun|turns?):[\w.:?=-]{1,200}$/;
 
 function parseServer(value: unknown): RTCIceServer | null {

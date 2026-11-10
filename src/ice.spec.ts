@@ -48,8 +48,8 @@ describe('ice', () => {
         { iceServers: [{ urls: ['stun:ok.test', 42] }] },
         { iceServers: [{ ...turn, credential: undefined }] },
         { iceServers: [{ ...turn, username: 7 }] },
-        { iceServers: Array.from({ length: 5 }, () => turn) },
-        { iceServers: [{ urls: Array.from({ length: 11 }, () => 'stun:ok.test') }] },
+        { iceServers: Array.from({ length: 9 }, () => turn) },
+        { iceServers: [{ urls: Array.from({ length: 33 }, () => 'stun:ok.test') }] },
       ]) {
         expect(parseIceServers(value)).toBeNull();
       }
