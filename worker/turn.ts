@@ -23,20 +23,21 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 // One object for the whole Worker. Calls run one at a time, so two rooms can't both take the last credential.
 export class TurnBudget extends DurableObject<Env> {
-  take(): boolean {
+  // The UTC day the credential counts on, or null past the cap
+  take(): string | null {
     const day = today();
     const stored = this.ctx.storage.kv.get<DailyCount>('daily-count');
     const count = stored?.day === day ? stored.count : 0;
-    if (count >= DAILY_CREDENTIALS_CAP) return false;
+    if (count >= DAILY_CREDENTIALS_CAP) return null;
 
     this.ctx.storage.kv.put<DailyCount>('daily-count', { day, count: count + 1 });
-    return true;
+    return day;
   }
 
-  // A request that got no credentials gives its place back (#66)
-  giveBack() {
+  // A request that got no credentials gives its place back to the day it took it from (#66, #76)
+  giveBack(day: string) {
     const stored = this.ctx.storage.kv.get<DailyCount>('daily-count');
-    if (stored?.day !== today() || stored.count === 0) return;
+    if (stored?.day !== day || stored.count === 0) return;
     this.ctx.storage.kv.put<DailyCount>('daily-count', { ...stored, count: stored.count - 1 });
   }
 }
@@ -45,7 +46,8 @@ export class TurnBudget extends DurableObject<Env> {
 // that expire (decision 001).
 export async function createIceServers(env: Env): Promise<IceServersResult> {
   const budget = env.TURN_BUDGET.getByName('daily');
-  if (!(await budget.take())) return { status: 'past-cap' };
+  const day = await budget.take();
+  if (!day) return { status: 'past-cap' };
 
   const response = await fetch(
     `${TURN_KEYS_API}/${env.TURN_KEY_ID}/credentials/generate-ice-servers`,
@@ -63,6 +65,6 @@ export async function createIceServers(env: Env): Promise<IceServersResult> {
   if (typeof body === 'object' && body !== null) return { status: 'created', iceServers: body };
 
   console.error('TURN credentials failed', response?.status ?? 'network error');
-  await budget.giveBack();
+  await budget.giveBack(day);
   return { status: 'failed' };
 }
