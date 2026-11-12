@@ -10,6 +10,8 @@ const STAGE_W = 112,
   STAGE_H = 104;
 const HARU_X = 58;
 const HY = { ground: 76, platform: 54, dropped: 62 };
+// How long the face of a hit or a miss stays before Haru goes back to idle
+const SETTLE_S = 1;
 
 // size: a fixed sprite scale. Without it the stage fills its parent, up to --stage-height.
 export function mountGallows(canvas: HTMLCanvasElement, size?: SpriteSize) {
@@ -113,10 +115,12 @@ export function mountGallows(canvas: HTMLCanvasElement, size?: SpriteSize) {
   }
 
   const stop = onFrame(draw);
+  let settle: gsap.core.Tween | null = null;
 
   function stopTweens() {
     gsap.killTweensOf(part);
     gsap.killTweensOf(s);
+    settle?.kill();
     s.loop = null;
   }
   // A new round: no pieces, Haru on the ground
@@ -153,8 +157,10 @@ export function mountGallows(canvas: HTMLCanvasElement, size?: SpriteSize) {
   }
 
   function setMood(m: Mood) {
+    settle?.kill();
     s.mood = m;
     react(s, m);
+    if (m === 'hit' || m === 'miss') settle = gsap.delayedCall(SETTLE_S, () => (s.mood = 'idle'));
     if (m === 'win' && part[6] > 0) to(part, { 6: 0, duration: 0.4, ease: 'power2.out' });
     if (m === 'loss') {
       s.dx = -1;
@@ -170,6 +176,7 @@ export function mountGallows(canvas: HTMLCanvasElement, size?: SpriteSize) {
   }
 
   let misses = -1; // nothing shown yet
+  let mood: Mood | null = null; // the last mood asked for; s.mood settles back to idle
   let guesses = 0;
   return {
     // Acts only on what changed. The first call shows the pieces without the fall;
@@ -180,8 +187,9 @@ export function mountGallows(canvas: HTMLCanvasElement, size?: SpriteSize) {
         if (next.misses === 0) reset();
         else setMisses(next.misses, misses === -1);
       }
-      if (misses === -1 || next.mood !== s.mood || next.guesses !== guesses) setMood(next.mood);
+      if (next.mood !== mood || next.guesses !== guesses) setMood(next.mood);
       misses = next.misses;
+      mood = next.mood;
       guesses = next.guesses;
     },
     stop() {

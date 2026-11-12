@@ -30,7 +30,8 @@
     if (g && !reduced) return g.to(target, vars);
     const values = { ...vars };
     ["duration", "ease", "delay", "repeat", "yoyo", "onComplete", "keyframes"].forEach((k) => delete values[k]);
-    Object.assign(target, values);
+    // A yoyo ends where it started, so there is nothing to set
+    if (!vars.yoyo) Object.assign(target, values);
     vars.onComplete?.();
     return null;
   }
@@ -216,6 +217,8 @@
   const STAGE_W = 112, STAGE_H = 104;
   const HARU_X = 58;
   const HY = { ground: 76, platform: 54, dropped: 62 };
+  // How long the face of a hit or a miss stays before Haru goes back to idle
+  const SETTLE_S = 1;
   const stages = [];
 
   function mountStage(canvas) {
@@ -225,6 +228,7 @@
     const ctx = canvas.getContext("2d");
     const s = { ...newState("idle"), hy: HY.ground, part: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 } };
     let lastWidth = -1;
+    let settle = null;
 
     function fit() {
       const wrap = canvas.parentElement;
@@ -316,6 +320,7 @@
         // Stop pieces still falling from the last round
         g?.killTweensOf(s.part);
         g?.killTweensOf(s);
+        settle?.kill();
         s.loop = null;
         for (let i = 1; i <= 7; i++) s.part[i] = 0;
         s.hy = HY.ground;
@@ -334,8 +339,10 @@
         else if (hy !== s.hy) to(s, { hy, duration: 0.35, delay: n === 1 ? 0.35 : 0, ease: n >= 7 ? "power2.in" : "back.out(2)" });
       },
       mood(m) {
+        settle?.kill();
         s.mood = m;
         react(s, m);
+        if (m === "hit" || m === "miss") settle = g?.delayedCall(SETTLE_S, () => (s.mood = "idle"));
         if (m === "win" && s.part[6] > 0) to(s.part, { 6: 0, duration: 0.4, ease: "power2.out" });
         if (m === "loss") {
           s.dx = -1;

@@ -38,7 +38,8 @@ export function to(target: object, vars: Vars) {
   ['duration', 'ease', 'delay', 'repeat', 'yoyo', 'onComplete', 'keyframes', 'overwrite'].forEach(
     (k) => delete values[k],
   );
-  Object.assign(target, values);
+  // A yoyo ends where it started, so there is nothing to set
+  if (!vars.yoyo) Object.assign(target, values);
   vars.onComplete?.();
   return null;
 }
