@@ -1,0 +1,69 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "haru",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-11-01",
+  "observability": {
+    "enabled": true,
+  },
+  "upload_source_maps": true,
+  // Set with `wrangler secret put` (and `--env staging`), or in .dev.vars locally.
+  "secrets": {
+    "required": ["TURN_KEY_ID", "TURN_KEY_API_TOKEN"],
+  },
+  // Production answers only on its own domain (decision 001).
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "haru.arualvivan.com", "custom_domain": true }],
+  // The Vite build fills in the assets directory.
+  "assets": {
+    "not_found_handling": "single-page-application",
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "ROOMS",
+        "class_name": "Room",
+      },
+      {
+        "name": "TURN_BUDGET",
+        "class_name": "TurnBudget",
+      },
+    ],
+  },
+  // The Free plan only runs SQLite-backed Durable Objects.
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["Room"],
+    },
+    {
+      "tag": "v2",
+      "new_sqlite_classes": ["TurnBudget"],
+    },
+  ],
+  "env": {
+    // Deployed on every push to develop, at its workers.dev URL.
+    // Durable Object bindings are not inherited, so they are repeated here.
+    "staging": {
+      "name": "haru-staging",
+      "workers_dev": true,
+      "routes": [],
+      "secrets": {
+        "required": ["TURN_KEY_ID", "TURN_KEY_API_TOKEN"],
+      },
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "ROOMS",
+            "class_name": "Room",
+          },
+          {
+            "name": "TURN_BUDGET",
+            "class_name": "TurnBudget",
+          },
+        ],
+      },
+    },
+  },
+}

@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  # Reused by the staging and release workflows before deploying.
+  workflow_call:
+    inputs:
+      ref:
+        description: Commit to check out. Empty means the event's default.
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+# A new push to a PR cancels its previous run. Runs called by the release
+# workflow share the release PR's group and replace its last run.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Type check, lint, format, tests and build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+          # Full history, so the format check can diff against the base branch.
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # A PR that only touches docs/ or .md files skips the code checks below.
+      # The steps are skipped with if: instead of paths-ignore on the workflow,
+      # because a required check stays Pending when its workflow doesn't run.
+      # Runs called by the release workflow check the merge commit already on
+      # main, where the diff is empty, so they skip this and run every check.
+      - name: Check whether only docs changed
+        id: changes
+        if: ${{ github.base_ref != '' && inputs.ref == '' }}
+        env:
+          BASE: ${{ github.base_ref }}
+        run: |
+          if git diff --name-only "origin/$BASE...HEAD" | grep -qvE '^docs/|\.md$'; then
+            echo "docs_only=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "docs_only=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies
+        id: install
+        run: npm ci --no-audit --no-fund
+
+      # Each check runs even if the one before failed, so a single run shows
+      # every problem. The job still fails if any of them fails.
+      - name: Type check
+        if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.changes.outputs.docs_only != 'true' }}
+        run: npm run typecheck
+
+      - name: Lint
+        if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.changes.outputs.docs_only != 'true' }}
+        run: npm run lint
+
+      # Only the files the PR changes are checked. Runs after a push skip it,
+      # and runs called by the release workflow find an empty diff, since the
+      # PRs already checked them. Files in .prettierignore are skipped.
+      - name: Check formatting of changed files
+        if: ${{ !cancelled() && steps.install.outcome == 'success' && github.base_ref != '' }}
+        env:
+          BASE: ${{ github.base_ref }}
+        run: |
+          files=$(git diff --name-only --diff-filter=ACMR "origin/$BASE...HEAD")
+          if [ -z "$files" ]; then
+            echo "No changed files to check."
+            exit 0
+          fi
+          echo "$files" | xargs -d '\n' npx prettier --check --ignore-unknown
+
+      - name: Run tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.changes.outputs.docs_only != 'true' }}
+        run: npm test
+
+      - name: Build
+        if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.changes.outputs.docs_only != 'true' }}
+        run: npm run build

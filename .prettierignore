@@ -1,0 +1,9 @@
+dist/
+.wrangler/
+docs/
+src/styles/tokens.css
+src/styles/base.css
+package-lock.json
+worker-configuration.d.ts
+*.md
+.github/

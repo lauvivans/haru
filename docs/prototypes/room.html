@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Haru room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pixelify+Sans:wght@400;700&display=swap">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="base.css">
+</head>
+<body data-scene="tavern">
+  <div class="page">
+    <header data-header></header>
+
+    <nav class="proto-states" aria-label="Prototype states">
+      <span>Prototype states:</span>
+      <button class="btn btn--ghost btn--small" data-show="nickname">Nickname</button>
+      <button class="btn btn--ghost btn--small" data-show="invite">Invite</button>
+      <button class="btn btn--ghost btn--small" data-show="join">Join by link</button>
+      <button class="btn btn--ghost btn--small" data-show="full">Room full</button>
+      <button class="btn btn--ghost btn--small" data-show="left">Player left</button>
+    </nav>
+
+    <main>
+      <!-- The player who creates the room types a nickname first -->
+      <section class="panel narrow stack" data-state="nickname">
+        <canvas class="sprite" data-size="md" data-mood="idle"></canvas>
+        <h1 class="center"><span lang="en">Play with a friend</span><span lang="pt-BR">Jogar com um amigo</span></h1>
+        <div class="field">
+          <label><span lang="en">Your Haru</span><span lang="pt-BR">Seu Haru</span></label>
+          <div class="looks" role="radiogroup" aria-label="Haru's look" style="justify-content: flex-start; margin: 0">
+            <button class="look" role="radio" data-pick-look="villager"><canvas class="sprite" data-size="sm" data-look="villager" data-mood="idle"></canvas><span lang="en">Villager</span><span lang="pt-BR">Aldeão</span></button>
+            <button class="look" role="radio" data-pick-look="wizard"><canvas class="sprite" data-size="sm" data-look="wizard" data-mood="idle"></canvas><span lang="en">Wizard</span><span lang="pt-BR">Mago</span></button>
+            <button class="look" role="radio" data-pick-look="knight"><canvas class="sprite" data-size="sm" data-look="knight" data-mood="idle"></canvas><span lang="en">Knight</span><span lang="pt-BR">Cavaleiro</span></button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="nick"><span lang="en">Your nickname</span><span lang="pt-BR">Seu apelido</span></label>
+          <input class="input" id="nick" maxlength="16" value="Laura" autocomplete="nickname">
+          <span class="field__hint"><span lang="en">1 to 16 characters. Your browser remembers it.</span><span lang="pt-BR">De 1 a 16 caracteres. O navegador guarda para a próxima vez.</span></span>
+        </div>
+        <button class="btn btn--primary btn--block" data-go="invite"><span lang="en">Create room</span><span lang="pt-BR">Criar sala</span></button>
+      </section>
+
+      <!-- Waiting for the friend to open the link -->
+      <section class="panel narrow stack" data-state="invite">
+        <canvas class="sprite" data-size="md" data-mood="idle"></canvas>
+        <h1 class="center"><span lang="en">Invite a friend</span><span lang="pt-BR">Convide um amigo</span></h1>
+        <p class="center muted"><span lang="en">Send this link. The game starts when your friend joins.</span><span lang="pt-BR">Mande este link. O jogo começa quando seu amigo entrar.</span></p>
+        <div class="field">
+          <label for="link"><span lang="en">Room link</span><span lang="pt-BR">Link da sala</span></label>
+          <div class="input-row">
+            <input class="input code" id="link" value="haru.example/r/K7QX" readonly>
+            <button class="btn btn--primary" id="copy"><span lang="en">Copy</span><span lang="pt-BR">Copiar</span></button>
+          </div>
+        </div>
+        <p class="center"><span class="muted"><span lang="en">Room code</span><span lang="pt-BR">Código da sala</span></span> <span class="code">K7QX</span></p>
+        <p class="center muted"><span lang="en">Waiting for your friend…</span><span lang="pt-BR">Esperando seu amigo…</span></p>
+        <a class="btn btn--ghost btn--block" href="duo.html"><span lang="en">Prototype: friend joined</span><span lang="pt-BR">Protótipo: amigo entrou</span></a>
+      </section>
+
+      <!-- The friend opens the link and types a nickname -->
+      <section class="panel narrow stack" data-state="join">
+        <canvas class="sprite" data-size="md" data-mood="hit"></canvas>
+        <h1 class="center"><span lang="en">Laura invited you</span><span lang="pt-BR">Laura te convidou</span></h1>
+        <p class="center muted"><span lang="en">Room</span><span lang="pt-BR">Sala</span> <span class="code">K7QX</span></p>
+        <div class="field">
+          <label><span lang="en">Your Haru</span><span lang="pt-BR">Seu Haru</span></label>
+          <div class="looks" role="radiogroup" aria-label="Haru's look" style="justify-content: flex-start; margin: 0">
+            <button class="look" role="radio" data-pick-look="villager"><canvas class="sprite" data-size="sm" data-look="villager" data-mood="idle"></canvas><span lang="en">Villager</span><span lang="pt-BR">Aldeão</span></button>
+            <button class="look" role="radio" data-pick-look="wizard"><canvas class="sprite" data-size="sm" data-look="wizard" data-mood="idle"></canvas><span lang="en">Wizard</span><span lang="pt-BR">Mago</span></button>
+            <button class="look" role="radio" data-pick-look="knight"><canvas class="sprite" data-size="sm" data-look="knight" data-mood="idle"></canvas><span lang="en">Knight</span><span lang="pt-BR">Cavaleiro</span></button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="nick2"><span lang="en">Your nickname</span><span lang="pt-BR">Seu apelido</span></label>
+          <input class="input" id="nick2" maxlength="16" placeholder="Ana" autocomplete="nickname">
+          <span class="field__hint"><span lang="en">1 to 16 characters.</span><span lang="pt-BR">De 1 a 16 caracteres.</span></span>
+        </div>
+        <a class="btn btn--primary btn--block" href="duo.html#guess"><span lang="en">Join room</span><span lang="pt-BR">Entrar na sala</span></a>
+      </section>
+
+      <!-- A third person opens the link -->
+      <section class="panel narrow stack center" data-state="full">
+        <canvas class="sprite" data-size="md" data-mood="miss"></canvas>
+        <h1><span lang="en">This room is full</span><span lang="pt-BR">Esta sala está cheia</span></h1>
+        <p class="muted"><span lang="en">A room holds two players. You can create your own room or play solo.</span><span lang="pt-BR">Cada sala tem dois jogadores. Você pode criar a sua sala ou jogar sozinho.</span></p>
+        <div class="result__actions">
+          <button class="btn btn--primary" data-go="nickname"><span lang="en">Create a room</span><span lang="pt-BR">Criar uma sala</span></button>
+          <a class="btn btn--ghost" href="solo.html"><span lang="en">Play solo</span><span lang="pt-BR">Jogar sozinho</span></a>
+        </div>
+      </section>
+
+      <!-- The other player leaves or loses the connection -->
+      <section class="panel narrow stack center" data-state="left">
+        <canvas class="sprite" data-size="md" data-mood="miss"></canvas>
+        <h1><span lang="en">Ana left the room</span><span lang="pt-BR">Ana saiu da sala</span></h1>
+        <p class="muted"><span lang="en">The connection was lost. You can wait for Ana to come back with the same link, or go back home.</span><span lang="pt-BR">A conexão caiu. Você pode esperar a Ana voltar pelo mesmo link ou voltar ao início.</span></p>
+        <p class="center"><span class="muted"><span lang="en">Score</span><span lang="pt-BR">Placar</span></span> <strong>Laura 2 × 1 Ana</strong></p>
+        <div class="result__actions">
+          <button class="btn btn--primary" data-go="invite"><span lang="en">Wait in the room</span><span lang="pt-BR">Esperar na sala</span></button>
+          <a class="btn btn--ghost" href="index.html"><span lang="en">Back home</span><span lang="pt-BR">Voltar ao início</span></a>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="haru.js"></script>
+  <script src="pixel.js"></script>
+  <script>
+    document.getElementById("copy").addEventListener("click", () => {
+      navigator.clipboard?.writeText(document.getElementById("link").value).catch(() => {});
+    });
+  </script>
+</body>
+</html>

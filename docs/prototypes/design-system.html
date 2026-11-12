@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Haru design system</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pixelify+Sans:wght@400;700&display=swap">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="base.css">
+</head>
+<body data-scene="castle">
+  <div class="page">
+    <header data-header></header>
+
+    <main class="stack">
+      <h1 class="sky-text">Design system</h1>
+
+      <section class="panel stack">
+        <h2>Colors</h2>
+        <p class="muted">Every value comes from <code>tokens.css</code>. Day is the light theme, night is the dark one: switch it in the header.</p>
+        <h3>Interface</h3>
+        <div class="swatches" data-swatches="--panel --panel-edge --text --text-muted --accent --accent-dark --hit --miss --key --focus"></div>
+        <h3>Pixel art</h3>
+        <div class="swatches" data-swatches="--px-sky-top --px-sky-mid --px-sky-low --px-mountain --px-hill --px-stone --px-roof --px-roof-blue --px-wood --px-wall --px-window-lit --px-tree --px-ground --px-flame --px-outline"></div>
+        <h3>Haru</h3>
+        <div class="swatches" data-swatches="--px-skin --px-hair --px-tunic --px-belt --px-pants --px-boots --px-cheek --px-rope --px-robe --px-gold --px-steel --px-tabard --px-plume"></div>
+      </section>
+
+      <section class="panel stack">
+        <h2>Type</h2>
+        <p style="font-family: var(--font-pixel); font-size: var(--text-3xl); margin: 0">Haru</p>
+        <p style="font-family: var(--font-pixel); font-size: var(--text-2xl); margin: 0">Pixelify Sans, titles</p>
+        <p style="font-family: var(--font-pixel); font-size: var(--text-xl); margin: 0">Buttons, keys and the word</p>
+        <p style="margin: 0">Nunito for reading text. Accents: ÁÂÃÀ Ç.</p>
+        <p class="muted" style="font-size: var(--text-sm); margin: 0">Small, muted</p>
+      </section>
+
+      <section class="panel stack">
+        <h2>Components</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center">
+          <button class="btn btn--primary">Primary</button>
+          <button class="btn btn--ghost">Ghost</button>
+          <button class="btn btn--ghost btn--small">Small</button>
+          <span class="hint">Animals</span>
+          <span class="player">Laura <span class="player__role">picks</span></span>
+        </div>
+        <div style="display: flex; gap: var(--space-1)">
+          <button class="key" style="width: var(--key-size)">A</button>
+          <button class="key key--hit" style="width: var(--key-size)" disabled>B</button>
+          <button class="key key--miss" style="width: var(--key-size)" disabled>C</button>
+        </div>
+        <div class="word"><span class="word__group"><span class="word__slot">H</span><span class="word__slot"></span><span class="word__slot">R</span><span class="word__slot"></span></span></div>
+        <div class="field" style="max-width: var(--dialog-max)">
+          <label for="ds-input">Field</label>
+          <input class="input" id="ds-input" placeholder="Nickname">
+          <span class="field__hint">Hint text</span>
+        </div>
+      </section>
+
+      <section class="panel stack">
+        <h2>Haru</h2>
+        <p class="muted">Haru is the one on the gallows. The player picks one of three looks, and every look has the same five reactions.</p>
+        <div class="gallery">
+          <figure><canvas class="sprite" data-size="md" data-look="villager" data-mood="idle" data-cycle></canvas><figcaption>Villager</figcaption></figure>
+          <figure><canvas class="sprite" data-size="md" data-look="wizard" data-mood="idle" data-cycle></canvas><figcaption>Wizard</figcaption></figure>
+          <figure><canvas class="sprite" data-size="md" data-look="knight" data-mood="idle" data-cycle></canvas><figcaption>Knight</figcaption></figure>
+        </div>
+        <p class="muted">Reactions, in the look you picked on the landing:</p>
+        <div class="gallery">
+          <figure><canvas class="sprite" data-size="md" data-mood="idle"></canvas><figcaption>Idle</figcaption></figure>
+          <figure><canvas class="sprite" data-size="md" data-mood="hit"></canvas><figcaption>Hit</figcaption></figure>
+          <figure><canvas class="sprite" data-size="md" data-mood="miss"></canvas><figcaption>Miss</figcaption></figure>
+          <figure><canvas class="sprite" data-size="md" data-mood="win"></canvas><figcaption>Win</figcaption></figure>
+          <figure><canvas class="sprite" data-size="md" data-mood="loss"></canvas><figcaption>Loss</figcaption></figure>
+        </div>
+      </section>
+
+      <section class="panel stack">
+        <h2>Gallows</h2>
+        <p class="muted">Each miss adds one piece: platform, post, beam, brace, rope, noose and, on the 7th, the trapdoor opens. A win takes the noose off.</p>
+        <div class="gallery" id="stages" style="grid-template-columns: repeat(auto-fill, minmax(calc(var(--tile-min) * 2), 1fr))"></div>
+      </section>
+    </main>
+  </div>
+  <script>
+    // Built before pixel.js runs so it paints them
+    const names = ["Start", "Platform", "Post", "Beam", "Brace", "Rope", "Noose", "Trapdoor"];
+    document.getElementById("stages").innerHTML =
+      names.map((n, i) => `<figure><canvas class="stage" data-size="sm" data-misses="${i}"${i === 7 ? ' data-mood="loss"' : ""}></canvas><figcaption>${i} · ${n}</figcaption></figure>`).join("") +
+      `<figure><canvas class="stage" data-size="sm" data-misses="5" data-mood="win"></canvas><figcaption>Win</figcaption></figure>`;
+    document.querySelectorAll("[data-swatches]").forEach((el) => {
+      el.innerHTML = el.dataset.swatches.split(" ").map((t) =>
+        `<div class="swatch"><div class="swatch__chip" style="background: var(${t})"></div><code>${t}</code></div>`).join("");
+    });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="haru.js"></script>
+  <script src="pixel.js"></script>
+</body>
+</html>
