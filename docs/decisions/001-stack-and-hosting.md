@@ -13,7 +13,7 @@ Where do the Haru client and the signaling server run so the game costs as close
 - **Cloudflare Workers for everything.** One Worker serves the client as static assets and handles signaling.
 - **One Durable Object per room for signaling.** Players connect to the room's Durable Object over WebSocket. It relays offers, answers and ICE candidates, and it uses the WebSocket Hibernation API so an idle room costs nothing.
 - **The client stays a Vite + React SPA**, built with the Cloudflare Vite plugin. React Router stays in library mode. Haru has no data to load on the server, so framework mode adds nothing.
-- **ICE: Google's public STUN plus Cloudflare Realtime TURN.** The Worker creates short-lived TURN credentials for each room, so the TURN key never reaches the browser, as the Cloudflare docs require.
+- **ICE: Cloudflare's public STUN plus Cloudflare Realtime TURN.** The Worker creates short-lived TURN credentials for each room, so the TURN key never reaches the browser, as the Cloudflare docs require.
 - **Leave the EC2.** The Fastify server in `server/` is replaced by the Worker, and Haru leaves the shared `t4g.micro`.
 
 ## Why
@@ -46,10 +46,10 @@ Without TURN, players behind strict NATs (some mobile networks and corporate net
 | Option                                | Cost                                    | Notes                                               |
 | ------------------------------------- | --------------------------------------- | --------------------------------------------------- |
 | **Cloudflare Realtime TURN (chosen)** | $0.05 per GB after a 1,000 GB free tier | Credentials created by the Worker; same account     |
-| Google public STUN only               | $0                                      | Fails behind symmetric NAT                          |
+| Public STUN only                      | $0                                      | Fails behind symmetric NAT                          |
 | Metered Open Relay                    | 20 GB per month free                    | Needs sign-up and an API key; no published SLA      |
 | ExpressTURN                           | 1,000 GB per month free                 | No published uptime or SLA                          |
-| coturn on the EC2                     | Share of the EC2                        | The setup the README describes; brings the EC2 back |
+| coturn on the EC2                     | Share of the EC2                        | The setup the study notes describe; brings the EC2 back |
 
 ### Limits on TURN
 
@@ -69,14 +69,14 @@ Settled in [#59](https://github.com/lauvivans/haru/issues/59) and tightened in [
 - The client connects to `wss://<haru domain>/rooms/<code>` on the same origin, so `VITE_SERVER_URL` goes away in production.
 - The TURN key is a Worker secret. When two players meet in a room, the room sends both of them credentials that expire, before the offer starts the connection.
 - The solo mode needs no network after the page loads.
-- The README section on building coturn on EC2 stays as study notes, marked as not used in production.
+- The section on building coturn on EC2 stays as study notes in `docs/study-notes/webrtc.md`, marked as not used in production.
 - Haru doesn't go on the EC2. If the infra repo already has a container or Caddy route for it, they are removed.
 
 ## Domain and deploys
 
 Settled on 2026-11-08 in [#15](https://github.com/lauvivans/haru/issues/15).
 
-- **Production:** `haru.arualvivan.com`, a custom domain on the Worker `haru`, the same zone as Gaku. Production has no `workers.dev` or preview URL. Every push to `main` runs CI and deploys it (`production.yml`).
+- **Production:** `haru.arualvivan.com`, a custom domain on the Worker `haru`, the same zone as Gaku. Production has no `workers.dev` or preview URL. Merging a release into `main` runs CI and deploys it (`release.yml`, [decision 003](003-release-flow.md)).
 - **Staging:** the Worker `haru-staging` at its `workers.dev` URL. Every push to `develop` runs CI and deploys it (`staging.yml`). It has its own Durable Objects, so rooms on staging and production never mix.
 - Both call `deploy.yml`, and a deploy never cancels another one on the same environment.
 - The workflows read two repository secrets: `CLOUDFLARE_API_TOKEN` (an API token from the "Edit Cloudflare Workers" template, with the zone resource set to `arualvivan.com`) and `CLOUDFLARE_ACCOUNT_ID`.
