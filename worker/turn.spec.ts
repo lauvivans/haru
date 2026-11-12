@@ -75,7 +75,7 @@ describe('Room TURN credentials', () => {
     it('counts every refresh against the daily cap and stops past it', async () => {
       const { room, turn, second } = await meetWithTurn();
       for (let i = 1; i < DAILY_CREDENTIALS_CAP; i++) await budget().take();
-      expect(await budget().take()).toBe(false);
+      expect(await budget().take()).toBeNull();
 
       expect(await runDurableObjectAlarm(room)).toBe(true);
       expect(second.messages).toEqual([iceServers]);
@@ -154,6 +154,20 @@ describe('Room TURN credentials', () => {
     await join(code);
     const second = await join(code);
     await vi.waitFor(() => expect(second.messages).toEqual([iceServers]));
+  });
+
+  it('gives a credential back to the day it was taken on', async () => {
+    const nextMidnight = new Date();
+    nextMidnight.setUTCHours(24, 0, 0, 0);
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(nextMidnight.getTime() - MINUTE);
+    const lastDay = new Date().toISOString().slice(0, 10);
+    expect(await budget().take()).toBe(lastDay);
+
+    vi.setSystemTime(nextMidnight);
+    expect(await budget().take()).toBe(nextMidnight.toISOString().slice(0, 10));
+    await budget().giveBack(lastDay);
+    expect(await credentialsLeft()).toBe(DAILY_CREDENTIALS_CAP - 1);
   });
 
   it('still connects the players with STUN only when TURN fails', async () => {
