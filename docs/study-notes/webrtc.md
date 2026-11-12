@@ -3,7 +3,7 @@
 Notes written while learning how WebRTC, signaling and TURN work. Some parts describe the first version of Haru, with a Fastify signaling server and coturn on EC2, which the Worker replaced.
 
 <div align="center">
-  <img src="/docs/assets/turn-stun-server.jpeg" alt="Explanation of Turn and Stun server in WebRTC" width="500px" />
+  <img src="../assets/turn-stun-server.jpeg" alt="Explanation of Turn and Stun server in WebRTC" width="500px" />
 </div>
 
 ## WebRTC (Web Real-Time Communication)
@@ -29,7 +29,7 @@ Peer connections in WebRTC specifications use peer-to-peer protocol to connect t
 In order to discover how two peers can connect, both clients need to provide an **ICE Server configuration**. This is either a STUN or a TURN-server, and their role is to provide ICE candidates to each client which is then transferred to the remote peer. This transferring of ICE candidates is commonly called signaling.
 
 <div align="center">
-  <img src="/docs/assets/webrtc-vs-websockets.png" alt="Explanation of the difference between WebRTC and WebSockets" width="500px" />
+  <img src="../assets/webrtc-vs-websockets.png" alt="Explanation of the difference between WebRTC and WebSockets" width="500px" />
 </div>
 
 [WebRTC - peer connections](https://webrtc.org/getting-started/peer-connections)
@@ -45,7 +45,7 @@ WebSockets are ideal for creating signaling server since it is reliable. Signals
 ## Signaling server
 
 <div align="center">
-  <img src="/docs/assets/peer-to-peer-signaling.png" alt="Explanation of Peer-to-Peer connection with signaling server" width="500px" />
+  <img src="../assets/peer-to-peer-signaling.png" alt="Explanation of Peer-to-Peer connection with signaling server" width="500px" />
 </div>
 
 Connecting two WebRTC users.
@@ -98,7 +98,7 @@ Follow the [tutorial](https://medium.com/@dushyantsom60/building-a-reliable-turn
 
 **Building a TURN-server with Coturn and EC2**
 
-> Study notes, not used in production. Haru uses Cloudflare TURN instead ([decision 001](docs/decisions/001-stack-and-hosting.md)).
+> Study notes, not used in production. Haru uses Cloudflare TURN instead ([decision 001](../decisions/001-stack-and-hosting.md)).
 
 > EC2 stands for Elastic Compute Cloud. It offers more than 750 instances and a range of processors, storage, network, OS.
 
