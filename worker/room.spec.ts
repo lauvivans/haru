@@ -168,11 +168,14 @@ describe('Room', () => {
   });
 
   it('hands out TURN credentials again on the next UTC day', async () => {
+    // workerd fires alarms by the real clock, so the faked days must not be in the past (#69).
+    const nextMidnight = new Date();
+    nextMidnight.setUTCHours(24, 0, 0, 0);
     vi.useFakeTimers({ toFake: ['Date'] });
-    vi.setSystemTime(new Date('2026-11-10T23:59:00Z'));
+    vi.setSystemTime(nextMidnight.getTime() - 60 * 1000);
     await useUpDailyCredentials();
 
-    vi.setSystemTime(new Date('2026-11-11T00:00:00Z'));
+    vi.setSystemTime(nextMidnight);
     turnAnswers(() => Response.json(ICE_SERVERS, { status: 201 }));
     const code = await newRoom();
     await join(code);
