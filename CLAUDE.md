@@ -25,6 +25,11 @@ Follow the guidelines below when implementing and when reviewing PRs. They are i
 - **Commits and PR title:** Conventional Commits.
 - **PR body:** ends with `Closes #<issue>`, also on fixes made after QA.
 - **Merge:** squash into `develop`. Releases go from a `release/<version>` branch, cut from `develop`, into `main` with a merge commit (never squash). Head branches are deleted on merge, so a PR must never come straight from `develop`.
+- **Release** ([decision 003](docs/decisions/003-release-flow.md)):
+  1. Run the "Cut release" workflow on `develop` (`gh workflow run cut-release.yml --ref develop`, optional `-f version=X.Y.Z`). It computes the version from the commits since the last `v*` tag, pushes `release/<version>` and opens `chore(release): <version>` to `main` with a `Closes` line per issue.
+  2. CI on that PR waits for approval, because `GITHUB_TOKEN` opened it. Approve the run on GitHub.
+  3. A fix found in QA goes in a PR to `release/<version>`.
+  4. Merge the release PR with a merge commit. The release workflow runs CI, creates the tag `v<version>` and the GitHub release with generated notes, and deploys production.
 - **After a release:** never rebase `develop`. If `main` got its own commits (hotfix), merge `main` back into `develop`.
 - **Attribution:** no `Co-Authored-By` or "Generated with Claude Code" in commits and PRs.
 - **Draft before creating:** show the full text of any issue or PR and only create it after approval.
