@@ -80,6 +80,7 @@ One Cloudflare Worker project at the repo root.
 - `docs/decisions/`: one decision per file, numbered. Every spike ends with a file here.
 - `docs/product/requirements.md`: what the game does and its rules.
 - `docs/prototypes/`: HTML prototype, the visual reference for screens, tokens and the character.
+- `docs/study-notes/`: notes on WebRTC, signaling and TURN written while learning them. Not a spec.
 
 Stack and hosting follow decision 001: client and signaling on one Cloudflare Worker, one Durable Object per room, STUN plus Cloudflare TURN. The goal is to spend as close to zero as possible, so a change that adds a paid service needs a decision first.
 
