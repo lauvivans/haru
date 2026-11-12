@@ -16,7 +16,7 @@ interface DailyCount {
   count: number;
 }
 
-export type IceServersResult =
+type IceServersResult =
   { status: 'created'; iceServers: object } | { status: 'past-cap' } | { status: 'failed' };
 
 const today = () => new Date().toISOString().slice(0, 10);

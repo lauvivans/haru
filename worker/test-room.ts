@@ -6,7 +6,7 @@ import { DAILY_CREDENTIALS_CAP } from './turn';
 const ORIGIN = 'https://haru.test';
 export const ICE_SERVERS = { iceServers: [{ urls: ['stun:stun.cloudflare.com:3478'] }] };
 
-export interface Player {
+interface Player {
   socket: WebSocket;
   messages: unknown[];
   closeCode?: number;
