@@ -1,5 +1,12 @@
 import { DurableObject } from 'cloudflare:workers';
-import { CREDENTIALS_REFRESH_MS, createIceServers } from './turn';
+import {
+  CREDENTIALS_REFRESH_MS,
+  CREDENTIALS_RETRY_MS,
+  CREDENTIALS_TTL_SECONDS,
+  createIceServers,
+} from './turn';
+
+const CREDENTIALS_EXPIRE_AT = 'credentials-expire-at';
 
 const MAX_PLAYERS = 2;
 // An offer with every ICE candidate inlined is a few KB. Anything far bigger is not signaling.
@@ -86,17 +93,28 @@ export class Room extends DurableObject<Env> {
 
   // Both players get credentials before the offer starts the connection
   private async meet(newcomer: WebSocket) {
+    this.ctx.storage.kv.delete(CREDENTIALS_EXPIRE_AT);
     await this.sendIceServers();
     this.othersThan(newcomer).forEach((other) => send(other, { type: 'peer-joined' }));
   }
 
   // TURN credentials only go to players who share a room, so there is no open
   // endpoint to mint them. Past the daily cap the players keep what they have.
+  // A refresh that fails is tried again while the players' credentials still work (#66).
   private async sendIceServers() {
-    const iceServers = await createIceServers(this.env);
-    if (!iceServers) return;
-    this.openSockets().forEach((player) => send(player, { type: 'ice-servers', data: iceServers }));
-    await this.ctx.storage.setAlarm(Date.now() + CREDENTIALS_REFRESH_MS);
+    const result = await createIceServers(this.env);
+    const now = Date.now();
+    if (result.status === 'created') {
+      const message = { type: 'ice-servers', data: result.iceServers };
+      this.openSockets().forEach((player) => send(player, message));
+      this.ctx.storage.kv.put(CREDENTIALS_EXPIRE_AT, now + CREDENTIALS_TTL_SECONDS * 1000);
+      await this.ctx.storage.setAlarm(now + CREDENTIALS_REFRESH_MS);
+    } else if (result.status === 'failed') {
+      const expireAt = this.ctx.storage.kv.get<number>(CREDENTIALS_EXPIRE_AT) ?? 0;
+      if (now + CREDENTIALS_RETRY_MS < expireAt) {
+        await this.ctx.storage.setAlarm(now + CREDENTIALS_RETRY_MS);
+      }
+    }
   }
 
   private leave(socket: WebSocket) {
