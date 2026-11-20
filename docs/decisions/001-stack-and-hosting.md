@@ -76,8 +76,8 @@ Settled in [#59](https://github.com/lauvivans/haru/issues/59) and tightened in [
 
 Settled on 2026-11-08 in [#15](https://github.com/lauvivans/haru/issues/15).
 
-- **Production:** `haru.arualvivan.com`, a custom domain on the Worker `haru`, the same zone as Gaku. Production has no `workers.dev` or preview URL. Merging a release into `main` runs CI and deploys it (`release.yml`, [decision 003](003-release-flow.md)).
-- **Staging:** the Worker `haru-staging` at its `workers.dev` URL. Every push to `develop` runs CI and deploys it (`staging.yml`). It has its own Durable Objects, so rooms on staging and production never mix.
+- **Production:** `haru.arualvivan.com`, a custom domain on the Worker `haru`, the same zone as Gaku. Production has no `workers.dev` or preview URL. Every merge into `main` runs CI and deploys it (`release.yml`, [decision 004](004-branching-workflow.md)).
+- **Staging:** the Worker `haru-staging` at its `workers.dev` URL. Every push to a pull request into `main` deploys its branch there (`staging.yml`, [decision 004](004-branching-workflow.md)). It has its own Durable Objects, so rooms on staging and production never mix.
 - Both call `deploy.yml`, and a deploy never cancels another one on the same environment.
 - The workflows read two repository secrets: `CLOUDFLARE_API_TOKEN` (an API token from the "Edit Cloudflare Workers" template, with the zone resource set to `arualvivan.com`) and `CLOUDFLARE_ACCOUNT_ID`.
 

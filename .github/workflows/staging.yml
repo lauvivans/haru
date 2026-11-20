@@ -1,19 +1,24 @@
-# Runs on every push to develop: CI, then the staging deploy.
+# Deploys a pull request's branch to staging on every push, so QA happens
+# before the merge. One staging slot: the last push wins.
+# See docs/decisions/004-branching-workflow.md.
 name: Staging
 
 on:
-  push:
-    branches: [develop]
+  pull_request:
+    branches: [main]
+  # Deploys any branch by hand, such as a Dependabot update that needs QA.
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  ci:
-    uses: ./.github/workflows/ci.yml
-
   deploy:
-    needs: ci
+    # Dependabot and fork PRs get no repository secrets, so they skip the deploy.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]')
     uses: ./.github/workflows/deploy.yml
     with:
       environment: staging

@@ -20,26 +20,20 @@ Follow the guidelines below when implementing and when reviewing PRs. They are i
 
 ## Workflow
 
-- **Base branch:** `develop`. PRs target it. `main` is the default branch and holds production.
+- **GitHub flow** ([decision 004](docs/decisions/004-branching-workflow.md)): `main` is the only long-lived branch and the default. Every change goes in a short-lived branch, opened as a PR into `main`.
 - **Branch name:** `<type>/kebab-case-name`.
-- **Commits and PR title:** Conventional Commits.
+- **Commits and PR title:** Conventional Commits. The squash commit takes the PR title, and the release workflow reads it to pick the version: `fix` and `perf` are a patch, `feat` a minor, `!` or a `BREAKING CHANGE` footer a major (a minor while `0.x`). `chore`, `docs`, `test`, `ci` and `refactor` don't tag a version.
 - **PR body:** ends with `Closes #<issue>`, also on fixes made after QA.
-- **Merge:** squash into `develop`. Releases go from a `release/<version>` branch, cut from `develop`, into `main` with a merge commit (never squash). Head branches are deleted on merge, so a PR must never come straight from `develop`.
-- **Release** ([decision 003](docs/decisions/003-release-flow.md)):
-  1. Run the "Cut release" workflow on `develop` (`gh workflow run cut-release.yml --ref develop`, optional `-f version=X.Y.Z`). It computes the version from the commits since the last `v*` tag, pushes `release/<version>` and opens `chore(release): <version>` to `main` with a `Closes` line per issue.
-  2. CI on that PR waits for approval, because `GITHUB_TOKEN` opened it. Approve the run on GitHub.
-  3. A fix found in QA goes in a PR to `release/<version>`.
-  4. Merge the release PR with a merge commit. The release workflow runs CI, creates the tag `v<version>` and the GitHub release with generated notes, and deploys production.
-- **After a release:** never rebase `develop`. If `main` got its own commits (hotfix), merge `main` back into `develop`.
+- **Staging:** every push to a PR deploys its branch to `haru-staging` (`staging.yml`). There is one staging slot, so the last push wins. Dependabot and fork PRs skip it; run `gh workflow run staging.yml --ref <branch>` when one needs QA.
+- **Merge:** squash into `main`. Every merge runs CI and deploys production, then tags `v<version>` and publishes the GitHub release when the title calls for a version (`release.yml`). Changes that must ship together go in the same PR. Head branches are deleted on merge.
 - **Attribution:** no `Co-Authored-By` or "Generated with Claude Code" in commits and PRs.
-- **Draft before creating:** show the full text of any issue or PR and only create it after approval.
+- **Draft before creating:** show the full text of any issue and only create it after approval. PRs are opened directly; say when one is open, with its link. They are reviewed on GitHub before merge.
 
 ## Issues and board
 
 - **Issues:** use the templates in `.github/ISSUE_TEMPLATE/` (bug, feature, chore, design, spike). The type goes in the label, not in the title. Documentation counts as `chore`.
-- **Board:** "Haru" (GitHub Project #8 of `lauvivans`). Status: Backlog → Ready → In progress → In review → In staging → Done.
+- **Board:** "Haru" (GitHub Project #8 of `lauvivans`). Status: Backlog → Ready → In progress → In review → Done.
   - When starting an issue, move it to **In progress**.
-  - When opening the PR, move it to **In review**.
-  - When the PR is merged into `develop`, move it to **In staging**.
-  - If QA on staging fails, move it back to **In progress** and fix it in a new PR on the same issue.
-  - The release to `main` closes the issue and moves it to **Done**. A problem found after that is a new bug issue that links the original.
+  - When opening the PR, move it to **In review**. QA happens on staging while the PR is open.
+  - If QA fails, move it back to **In progress** and push the fix to the same PR.
+  - Merging the PR closes the issue through `Closes #<issue>` and moves it to **Done**. A problem found after that is a new bug issue that links the original.

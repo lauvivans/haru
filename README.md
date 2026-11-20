@@ -14,7 +14,7 @@ Everything runs on one Cloudflare Worker ([decision 001](docs/decisions/001-stac
 - **ICE.** Cloudflare's public STUN, plus Cloudflare Realtime TURN for networks where a direct connection fails. When two players meet, the room creates short-lived TURN credentials and sends them to both, so the TURN key stays a Worker secret. A second Durable Object (`TurnBudget` in `worker/turn.ts`) keeps a daily cap on them.
 - **Solo.** Runs in the browser only and needs no network after the page loads.
 
-`develop` deploys to staging and `main` deploys to production ([decision 003](docs/decisions/003-release-flow.md)).
+Pull requests deploy to staging and every merge into `main` deploys to production ([decision 004](docs/decisions/004-branching-workflow.md)).
 
 ## Running locally
 
