@@ -2,7 +2,7 @@
 
 - **Date:** 2026-11-11
 - **Origin:** spike [#67](https://github.com/lauvivans/haru/issues/67), before setting up versions ([#20](https://github.com/lauvivans/haru/issues/20)) and the first release to `main`
-- **Status:** proposed
+- **Status:** proposed. The release branches are superseded by [decision 004](004-branching-workflow.md); the version rule and the release notes stay.
 
 ## Question
 
