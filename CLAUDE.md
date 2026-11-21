@@ -24,7 +24,7 @@ Follow the guidelines below when implementing and when reviewing PRs. They are i
 - **Branch name:** `<type>/kebab-case-name`.
 - **Commits and PR title:** Conventional Commits. The squash commit takes the PR title, and the release workflow reads it to pick the version: `fix` and `perf` are a patch, `feat` a minor, `!` or a `BREAKING CHANGE` footer a major (a minor while `0.x`). `chore`, `docs`, `test`, `ci` and `refactor` don't tag a version.
 - **PR body:** ends with `Closes #<issue>`, also on fixes made after QA.
-- **Staging:** every push to a PR deploys its branch to `haru-staging` (`staging.yml`). There is one staging slot, so the last push wins. Dependabot and fork PRs skip it; run `gh workflow run staging.yml --ref <branch>` when one needs QA.
+- **Staging:** every push to a PR deploys it, merged with `main`, to `haru-staging` (`staging.yml`). There is one staging slot, so the last push wins. Dependabot and fork PRs skip it; run `gh workflow run staging.yml --ref <branch>` when one needs QA.
 - **Merge:** squash into `main`. Every merge runs CI and deploys production, then tags `v<version>` and publishes the GitHub release when the title calls for a version (`release.yml`). Changes that must ship together go in the same PR. Head branches are deleted on merge.
 - **Attribution:** no `Co-Authored-By` or "Generated with Claude Code" in commits and PRs.
 - **Draft before creating:** show the full text of any issue and only create it after approval. PRs are opened directly; say when one is open, with its link. They are reviewed on GitHub before merge.
