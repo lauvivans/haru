@@ -1,5 +1,5 @@
-# Deploys one environment. Called by staging.yml (push to develop) and
-# release.yml (release merged into main).
+# Deploys one environment. Called by staging.yml (pull requests into main) and
+# release.yml (push to main).
 name: Deploy
 
 on:
@@ -9,11 +9,6 @@ on:
         description: staging or production.
         required: true
         type: string
-      ref:
-        description: Commit to deploy. Empty means the event's default.
-        required: false
-        type: string
-        default: ""
     secrets:
       CLOUDFLARE_API_TOKEN:
         required: true
@@ -48,8 +43,6 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v7
-        with:
-          ref: ${{ inputs.ref }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v7

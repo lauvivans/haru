@@ -2,21 +2,14 @@ name: CI
 
 on:
   pull_request:
-    branches: [main, develop]
-  # Reused by the staging and release workflows before deploying.
+    branches: [main]
+  # Reused by the release workflow before deploying production.
   workflow_call:
-    inputs:
-      ref:
-        description: Commit to check out. Empty means the event's default.
-        required: false
-        type: string
-        default: ""
 
 permissions:
   contents: read
 
-# A new push to a PR cancels its previous run. Runs called by the release
-# workflow share the release PR's group and replace its last run.
+# A new push to a PR cancels its previous run.
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
@@ -30,7 +23,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.ref }}
           # Full history, so the format check can diff against the base branch.
           fetch-depth: 0
 
@@ -43,11 +35,11 @@ jobs:
       # A PR that only touches docs/ or .md files skips the code checks below.
       # The steps are skipped with if: instead of paths-ignore on the workflow,
       # because a required check stays Pending when its workflow doesn't run.
-      # Runs called by the release workflow check the merge commit already on
-      # main, where the diff is empty, so they skip this and run every check.
+      # Runs called by the release workflow, on a push to main, have no base
+      # branch, so they skip this and run every check.
       - name: Check whether only docs changed
         id: changes
-        if: ${{ github.base_ref != '' && inputs.ref == '' }}
+        if: ${{ github.base_ref != '' }}
         env:
           BASE: ${{ github.base_ref }}
         run: |
@@ -71,9 +63,9 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.changes.outputs.docs_only != 'true' }}
         run: npm run lint
 
-      # Only the files the PR changes are checked. Runs after a push skip it,
-      # and runs called by the release workflow find an empty diff, since the
-      # PRs already checked them. Files in .prettierignore are skipped.
+      # Only the files the PR changes are checked. Runs on a push to main skip
+      # it, since the PRs already checked them. Files in .prettierignore are
+      # skipped.
       - name: Check formatting of changed files
         if: ${{ !cancelled() && steps.install.outcome == 'success' && github.base_ref != '' }}
         env:

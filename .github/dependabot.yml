@@ -6,7 +6,6 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    target-branch: develop
     labels:
       - chore
     commit-message:
@@ -25,7 +24,6 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    target-branch: develop
     labels:
       - chore
     commit-message:

@@ -1,11 +1,10 @@
-# Runs when a pull request from release/<version> is merged into main: CI,
-# then the tag, the GitHub release and the production deploy.
-# See docs/decisions/003-release-flow.md.
+# Runs on every push to main: CI, the production deploy, then the tag and the
+# GitHub release when the commits call for a version.
+# See docs/decisions/004-branching-workflow.md.
 name: Release
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches: [main]
 
 permissions:
@@ -16,55 +15,71 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  version:
-    name: Read the version from the branch name
-    if: github.event.pull_request.merged && startsWith(github.head_ref, 'release/')
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-
-    steps:
-      - name: Check the branch name
-        id: version
-        env:
-          BRANCH: ${{ github.head_ref }}
-        run: |
-          version=${BRANCH#release/}
-          if ! [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::$BRANCH is not release/X.Y.Z."
-            exit 1
-          fi
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-
   ci:
-    needs: version
     uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: ci
+    uses: ./.github/workflows/deploy.yml
     with:
-      ref: ${{ github.event.pull_request.merge_commit_sha }}
+      environment: production
+    secrets:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
   release:
     name: Tag and publish the GitHub release
-    needs: [version, ci]
+    needs: deploy
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          # Full history and tags, for the version rule.
+          fetch-depth: 0
+
+      # Version rule from decision 003. Only feat, fix, perf and breaking
+      # changes tag a version; other commits deploy without one.
+      - name: Compute the version
+        id: version
+        run: |
+          last=$(git tag --list 'v*' --sort=-v:refname | head -n1)
+          range=${last:+$last..}HEAD
+          subjects=$(git log --format=%s "$range")
+          IFS=. read -r major minor patch <<< "${last#v}"
+          major=${major:-0} minor=${minor:-0} patch=${patch:-0}
+
+          if grep -qE '^[a-z]+(\([^)]*\))?!:' <<< "$subjects" ||
+            git log --format=%B "$range" | grep -qE '^BREAKING[ -]CHANGE:'; then
+            # In 0.x a breaking change bumps the minor.
+            if [ "$major" -eq 0 ]; then
+              minor=$((minor + 1))
+            else
+              major=$((major + 1))
+              minor=0
+            fi
+            patch=0
+          elif grep -qE '^feat(\([^)]*\))?:' <<< "$subjects"; then
+            minor=$((minor + 1))
+            patch=0
+          elif grep -qE '^(fix|perf)(\([^)]*\))?:' <<< "$subjects"; then
+            patch=$((patch + 1))
+          else
+            echo "No feat, fix, perf or breaking change since ${last:-the start}. No release."
+            exit 0
+          fi
+
+          echo "Version $major.$minor.$patch (last tag: ${last:-none})."
+          echo "version=$major.$minor.$patch" >> "$GITHUB_OUTPUT"
+
       - name: Create the tag and the release
+        if: steps.version.outputs.version != ''
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: v${{ needs.version.outputs.version }}
-          SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          TAG: v${{ steps.version.outputs.version }}
         run: |
-          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$SHA" \
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --title "$TAG" --generate-notes
-
-  deploy:
-    needs: release
-    uses: ./.github/workflows/deploy.yml
-    with:
-      environment: production
-      ref: ${{ github.event.pull_request.merge_commit_sha }}
-    secrets:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

@@ -1,12 +1,12 @@
 # Checks that the PR title is a Conventional Commit. The squash merge uses the
-# title as the commit subject, and the cut release workflow reads it to pick
+# title as the commit subject, and the release workflow reads it to pick
 # the version. Separate from ci.yml so a title edit doesn't rerun every check.
 name: PR title
 
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
-    branches: [main, develop]
+    branches: [main]
 
 permissions:
   contents: read
