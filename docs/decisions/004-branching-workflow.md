@@ -12,7 +12,7 @@ Which branching workflow does Haru follow: the git flow it used until now (`deve
 ## Short answer
 
 - **GitHub flow.** `main` is the only long-lived branch. Each change goes in a short-lived branch named `<type>/kebab-case-name`, opened as a pull request into `main` and squash-merged.
-- **Staging is deployed from the pull request.** Every push to a pull request from this repository runs CI and deploys the branch to `haru-staging`. QA happens there, before the merge. There is one staging slot, so the last push wins.
+- **Staging is deployed from the pull request.** Every push to a pull request from this repository deploys it to `haru-staging`, merged with `main`. QA happens there, before the merge. There is one staging slot, so the last push wins.
 - **Every merge deploys production.** A merge into `main` runs CI and deploys `haru`. Anything on `main` is live.
 - **The pull request title picks the version.** When the merged title is a `feat`, a `fix`, a `perf` or a breaking change, the same workflow tags the next version with the rule from decision 003 and publishes the GitHub release with generated notes. `chore`, `docs`, `test`, `ci` and `refactor` merges deploy but don't tag.
 
@@ -30,7 +30,7 @@ Options compared: git flow (current), GitHub flow, trunk-based development and G
 
 - `develop` is retired. It has no commits beyond 0.1.0, so nothing is left to release from it.
 - `cut-release.yml` is deleted. `release.yml` runs on every push to `main`: CI, the production deploy, then the tag and the GitHub release when the commit subject calls for a version.
-- `staging.yml` runs on pull requests into `main` and deploys the head branch to staging. It also takes `workflow_dispatch`, to deploy any branch by hand.
+- `staging.yml` runs on pull requests into `main` and deploys the pull request, merged with `main`, to staging. It also takes `workflow_dispatch`, to deploy any branch by hand.
 - Pull requests from Dependabot and from forks get no repository secrets: Dependabot runs "are treated as if they were opened from a repository fork" and "GitHub Actions secrets are not available". They skip the staging deploy. A maintainer runs the staging workflow on the branch by hand when a dependency update needs QA.
 - `ci.yml` and `pr-title.yml` run on pull requests into `main` only. Dependabot drops `target-branch`.
 - `Closes #<issue>` closes the issue when its pull request is merged. The board loses "In staging": QA happens while the issue is **In review**, and the merge moves it to **Done**.
